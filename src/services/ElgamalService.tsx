@@ -1,3 +1,18 @@
+interface ElGamalPublicKey {
+	p: bigint;
+	g: bigint;
+	e: bigint;
+}
+
+interface ElGamalKeys {
+	publicKey: ElGamalPublicKey;
+	privateKey: bigint;
+}
+
+interface CipherChar {
+	c1: number,
+	c2: number
+}
 
 export default class ElgamalService {
 
@@ -65,40 +80,45 @@ export default class ElgamalService {
 	}
 
 	generateKeyPair(): ElGamalKeys {
-		let eValue = 0;
-		let randomPrime = 0;
-		let primitiveRoot = 0;
-		let privKey = 0;
+		let eValue: number;
+		let randomPrime: number;
+		let primitiveRoot: number;
+		let privKey: number;
 
 		do {
-			randomPrime = this.getRandomPrime(10, 100);
+			randomPrime = this.getRandomPrime(100, 500);
 			primitiveRoot = this.getPrimitiveRoot(randomPrime);
-	
-			privKey = Math.floor(
-				Math.random() * (randomPrime - 2) + 1
-			)
+
+			const randomBytes = new Uint8Array(1); // Adjust the size according to your needs
 			
-			eValue = (Math.pow(primitiveRoot, privKey)) % randomPrime
+			do {
+				privKey = window.crypto.getRandomValues(randomBytes)[0]
+			}
+			while (1 !== privKey && privKey >= randomPrime - 1)
+
+			privKey = this.getRandomPrime(1, randomPrime - 2);
+			
+			eValue = (primitiveRoot ** privKey) % randomPrime
 			
 		} while (Number.isNaN(eValue))
 			
 		const pubKey: ElGamalPublicKey = {
-			p: randomPrime,
-			g: primitiveRoot,
-			e: eValue
+			p: BigInt(randomPrime),
+			g: BigInt(primitiveRoot),
+			e: BigInt(eValue)
 
 		}
 
 		return {
 			publicKey: pubKey,
-			privateKey: privKey
+			privateKey: BigInt(privKey)
 		}
 	}
 
 	encryptation(plainText: string, pubkey: ElGamalPublicKey): CipherChar[] {
-		let bValue = 0;
-		let c1 = 0;
-		let c2 = 0;
+		let bValue: bigint;
+		let c1;
+		let c2;
 		let cipherChar: CipherChar = {
 			c1: 0,
 			c2: 0
@@ -110,13 +130,15 @@ export default class ElgamalService {
 
 		for (let i = 0; i < unicodeArray.length; i++) {
 			do {
+
+				const randomBytes = new Uint8Array(1); // Adjust the size according to your needs
 	
-				bValue = Math.floor(
-					Math.random() * (pubkey.p - 2) + 1
-				)
+				bValue = BigInt(window.crypto.getRandomValues(randomBytes)[0])
 		
-				c1 = (Math.pow(pubkey.g, bValue)) % pubkey.p
-				c2 = unicodeArray[i] * (Math.pow(pubkey.e, bValue)) % pubkey.p
+				c1 = Number((pubkey.g ** bValue) % pubkey.p)
+
+
+				c2 = Number(BigInt(unicodeArray[i]) * (pubkey.e ** bValue) % pubkey.p)
 		
 				cipherChar = {
 					c1: c1,
@@ -138,8 +160,8 @@ export default class ElgamalService {
 		const decrypted = [];
 
 		for (let i = 0; i < cipherText.length; i++) {
-			const xValue = Math.pow(cipherText[i].c1, keys.privateKey) % keys.publicKey.p;
-			const decryptedChar = cipherText[i].c2 * Math.pow(xValue, (keys.publicKey.p - 2)) % keys.publicKey.p;
+			const xValue = (BigInt(cipherText[i].c1) ** keys.privateKey) % keys.publicKey.p;
+			const decryptedChar = Number(BigInt(cipherText[i].c2) * (xValue ** (keys.publicKey.p - BigInt(2))) % keys.publicKey.p)
 			decrypted.push(decryptedChar)
 		}
 

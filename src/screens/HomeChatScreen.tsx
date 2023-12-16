@@ -20,7 +20,7 @@ export default function HomeChatScreen() {
 
 	function CryptoTest() {
 		// Example usage:
-		const msg = "ABC";
+		const msg = "Hello, World!";
 		const keys = crypto.generateKeyPair();
 
 		const cipherText = crypto.encryptation(msg, keys.publicKey)
@@ -30,7 +30,6 @@ export default function HomeChatScreen() {
 		const decipherText = crypto.decryptation(cipherText, keys);
 
 		console.log(decipherText);
-		
 
 	}
 

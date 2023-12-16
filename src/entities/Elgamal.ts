@@ -1,13 +1,13 @@
 // ElGamal public key interface
 interface ElGamalPublicKey {
-    p: number;
-    g: number;
-    e: number;
+    p: bigint;
+    g: bigint;
+    e: bigint;
 }
 
 interface ElGamalKeys {
     publicKey: ElGamalPublicKey;
-    privateKey: number;
+    privateKey: bigint;
 }
 
 interface CipherChar {
