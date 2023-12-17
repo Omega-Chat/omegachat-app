@@ -1,18 +1,6 @@
-interface ElGamalPublicKey {
-	p: bigint;
-	g: bigint;
-	e: bigint;
-}
-
-interface ElGamalKeys {
-	publicKey: ElGamalPublicKey;
-	privateKey: bigint;
-}
-
-interface CipherChar {
-	c1: number,
-	c2: number
-}
+import { ElGamalPublicKey } from "../entities/Elgamal";
+import { ElGamalKeys } from "../entities/Elgamal";
+import { CipherChar } from "../entities/Elgamal";
 
 export default class ElgamalService {
 
@@ -103,9 +91,9 @@ export default class ElgamalService {
 		} while (Number.isNaN(eValue))
 			
 		const pubKey: ElGamalPublicKey = {
-			p: BigInt(randomPrime),
-			g: BigInt(primitiveRoot),
-			e: BigInt(eValue)
+			p: String(BigInt(randomPrime)),
+			g: String(BigInt(primitiveRoot)),
+			e: String(BigInt(eValue))
 
 		}
 
@@ -135,10 +123,10 @@ export default class ElgamalService {
 	
 				bValue = BigInt(window.crypto.getRandomValues(randomBytes)[0])
 		
-				c1 = Number((pubkey.g ** bValue) % pubkey.p)
+				c1 = Number((BigInt(pubkey.g) ** bValue) % BigInt(pubkey.p))
 
 
-				c2 = Number(BigInt(unicodeArray[i]) * (pubkey.e ** bValue) % pubkey.p)
+				c2 = Number(BigInt(unicodeArray[i]) * (BigInt(pubkey.e) ** bValue) % BigInt(pubkey.p))
 		
 				cipherChar = {
 					c1: c1,
@@ -160,8 +148,8 @@ export default class ElgamalService {
 		const decrypted = [];
 
 		for (let i = 0; i < cipherText.length; i++) {
-			const xValue = (BigInt(cipherText[i].c1) ** keys.privateKey) % keys.publicKey.p;
-			const decryptedChar = Number(BigInt(cipherText[i].c2) * (xValue ** (keys.publicKey.p - BigInt(2))) % keys.publicKey.p)
+			const xValue = (BigInt(cipherText[i].c1) ** keys.privateKey) % BigInt(keys.publicKey.p);
+			const decryptedChar = Number(BigInt(cipherText[i].c2) * (xValue ** (BigInt(keys.publicKey.p) - BigInt(2))) % BigInt(keys.publicKey.p))
 			decrypted.push(decryptedChar)
 		}
 

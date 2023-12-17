@@ -1,16 +1,16 @@
 // ElGamal public key interface
-interface ElGamalPublicKey {
-    p: bigint;
-    g: bigint;
-    e: bigint;
+export interface ElGamalPublicKey {
+    p: string;
+    g: string;
+    e: string;
 }
 
-interface ElGamalKeys {
+export interface ElGamalKeys {
     publicKey: ElGamalPublicKey;
     privateKey: bigint;
 }
 
-interface CipherChar {
+export interface CipherChar {
     c1: number,
     c2: number
 }

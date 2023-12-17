@@ -1,37 +1,96 @@
 // import { useNavigate } from "react-router-dom";
 // import {useEffect, useState} from "react";
-import { primary } from "../theme/colors";
+import { leaveChat, primary } from "../theme/colors";
 import { User } from "../entities/User";
 import UserChatCard from "../components/userChatCard";
 import ElgamalService from "../services/ElgamalService";
+import { useEffect, useState } from "react";
+import { ElGamalKeys } from "../entities/Elgamal";
+import {useLocation, useNavigate} from 'react-router-dom';
+import { FetchAll } from "../use_cases/users/FetchAll";
+import UserService from "../services/UserService";
+import { UpdatePubKey } from "../use_cases/users/UpdatePubKey";
+import { ExitChat } from "../use_cases/users/ExitChat";
+
+
 
 const crypto = new ElgamalService();
+const fetchall = new FetchAll(new UserService())
+const updatepubkey = new UpdatePubKey(new UserService())
+const exitchat = new ExitChat(new UserService())
 
 
 export default function HomeChatScreen() {
 
-	// const navigate = useNavigate();
-	// const [userList, setUserList] = useState<User[]>();
-	const users: User[] = [
-		{"name": "Arthur", "password": 1234, "online": true},
-		{"name": "Guilherme", "password": 1234, "online": true},
-		{"name": "Lídia", "password": 1234, "online": false}
-	]
+	const location = useLocation();
+	const navigate = useNavigate();
 
-	function CryptoTest() {
-		// Example usage:
-		const msg = "Hello, World!";
-		const keys = crypto.generateKeyPair();
+	const [onlineUserList, setOnlineUserList] = useState<User[]>();
 
-		const cipherText = crypto.encryptation(msg, keys.publicKey)
+	useEffect(() => {
+		let keys = CryptographyTest();
+		fetchall.execute().then((data) => {
+			let filteredUsers = RemoveUserByName(data, location.state.user.name);
+			setOnlineUserList(filteredUsers);
+		})
+		updatepubkey.execute(location.state.user._id, keys?.publicKey)
+		
 
-		console.log(cipherText);
+	}, []);
 
-		const decipherText = crypto.decryptation(cipherText, keys);
-
-		console.log(decipherText);
-
+	function RemoveUserByName(usersArray: User[], userName: string) {
+		// Find the index of the user with the specified name
+		const indexToRemove = usersArray.findIndex(user => user.name === userName);
+	
+		// If the user with the specified name is found, remove it from the array
+		if (indexToRemove !== -1) {
+			usersArray.splice(indexToRemove, 1);
+		}
+	
+		// Return the modified array
+		return usersArray;
 	}
+
+	function CryptographyTest() {
+		try {
+			// Example usage:
+			const test_msg = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+			let keys: ElGamalKeys;
+			let decipherText;
+
+			do {
+
+				keys = crypto.generateKeyPair();
+	
+				const cipherText = crypto.encryptation(test_msg, keys.publicKey)
+		
+				decipherText = crypto.decryptation(cipherText, keys);
+
+			} while (test_msg !== decipherText);
+
+			// console.log(decipherText);
+
+			return keys;
+	
+
+		} catch (error: any) {
+			console.log(error)
+		}
+	}
+
+	async function LeaveChat() {
+		try {
+			const exitedUser = await exitchat.execute(location.state.user._id);
+			console.log(exitedUser)
+
+			navigate("/");
+
+		} catch (error: any) {
+			console.log(error)
+		}
+	}
+
+
 
 	return (
 		<div className="container">
@@ -56,7 +115,7 @@ export default function HomeChatScreen() {
 					backgroundColor: "black" 
 				}}/>
 				<div className="itens-list">
-					{users?.map((doc, index) =>
+					{onlineUserList?.map((doc, index) =>
 						<UserChatCard 
 							data={doc}
 							key={index}
@@ -71,13 +130,14 @@ export default function HomeChatScreen() {
 						marginTop: "100%",
 						height: 50,
 						width: 352,
-						backgroundColor: primary,
-						color: "white",
+						backgroundColor: leaveChat,
+						color: "black",
+						fontWeight: "bold",
 						borderRadius: 5,
-						fontSize: 15
+						fontSize: 20
 
 					}}
-					onClick={CryptoTest}>Test</button>
+					onClick={LeaveChat}>Leave Chat</button>
 			</div>
 		</div>
 	)

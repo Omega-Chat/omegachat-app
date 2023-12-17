@@ -1,9 +1,30 @@
 import { useNavigate } from "react-router-dom";
 import { primary } from "../theme/colors";
+import UserService from "../services/UserService";
+import Login from "../use_cases/users/Login";
+import { useState } from "react";
+
+const loginUser = new Login(new UserService());
 
 export default function LoginScreen() {
 
+	const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
 	const navigate = useNavigate();
+
+	async function SendData() {
+
+        try {
+                const loggeduser = await loginUser.execute(email, password);
+
+                navigate("/chat", {state: {user: loggeduser}});
+
+        } catch (error: any) {
+            console.log(error)
+        }
+
+    }
 
 	return (
 		<div 
@@ -47,7 +68,9 @@ export default function LoginScreen() {
 						borderColor: primary
 					}}
 					type="text"
-					onChange={() => null}/>
+					onChange={e => {
+						setEmail(e.target.value);
+					}}/>
 
 			</div>
 			<div 
@@ -72,7 +95,9 @@ export default function LoginScreen() {
 						borderColor: primary
 					}}
 					type="text"
-					onChange={() => null}/>
+					onChange={e => {
+						setPassword(e.target.value);
+					}}/>
 
 			</div>
 			<button
@@ -88,7 +113,7 @@ export default function LoginScreen() {
 					fontSize: 15
 
 				}}
-				onClick={() => navigate("/chat")}>Log In</button>
+				onClick={SendData}>Log In</button>
 
 		</div>
 			
