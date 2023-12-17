@@ -57,20 +57,21 @@ const GroupChat: React.FC<ChatProps> = ({ messages: initialMessages }) => {
     backgroundColor: '#8a2be2',
     color: 'white',
     borderRadius: '15px', 
-    padding: '8px 12px',
-    marginRight: '0px', 
+    padding: '8px 12px', 
     marginBottom: '8px',
     maxWidth: '90%',
+    marginLeft: 'auto',
   };
 
   const otherMessageStyle: React.CSSProperties = {
     alignSelf: 'flex-start',
-    backgroundColor: '#dcdcdc',
+    backgroundColor: '#C59DF7',
     color: 'black',
     borderRadius: '15px',
     padding: '8px 12px', 
     marginBottom: '8px',
     maxWidth: '90%',
+    marginRight: 'auto',
   };
 
   const inputContainerStyle: React.CSSProperties = {
@@ -107,7 +108,7 @@ const GroupChat: React.FC<ChatProps> = ({ messages: initialMessages }) => {
     fontFamily: 'Rubik', 
     fontSize: '12px', 
     fontWeight: 500,
-    color: '#FFFFFF',
+    color: '#2D3F65',
     marginBottom: '5px'
   };
   const topBarStyle: React.CSSProperties = {
@@ -127,7 +128,7 @@ const GroupChat: React.FC<ChatProps> = ({ messages: initialMessages }) => {
     letterSpacing: '0em',
     margin: 15,
     textAlign: 'left',
-    marginBottom: '10px',
+    marginBottom: '30px',
     marginTop: '15px',
     color:'#5034C4',
   };

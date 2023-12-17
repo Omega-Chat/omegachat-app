@@ -75,7 +75,7 @@ const Chat: React.FC<ChatProps> = ({ messages: initialMessages, recipientName })
 
   const otherMessageStyle: React.CSSProperties = {
     alignSelf: 'flex-start',
-    backgroundColor: '#dcdcdc',
+    backgroundColor: '#C59DF7',
     color: 'black',
   };
 
@@ -117,7 +117,7 @@ const Chat: React.FC<ChatProps> = ({ messages: initialMessages, recipientName })
     letterSpacing: '0em',
     margin: 15,
     textAlign: 'left',
-    marginBottom: '10px',
+    marginBottom: '30px',
     marginTop: '15px',
     color:'#5034C4',
   };
