@@ -5,12 +5,13 @@ import { primary, userCardBackground } from '../theme/colors';
 
 
 interface Props {
-    data: User
+    data: User;
+    onChatStart: () => void;
 }
 
 
 
-const UserChatCard: React.FC<Props> = ({data}) => {
+const UserChatCard: React.FC<Props> = ({data, onChatStart}) => {
     
     const navigate = useNavigate();
 
@@ -46,7 +47,7 @@ const UserChatCard: React.FC<Props> = ({data}) => {
                                 marginRight: 10
 
                             }}
-                            onClick={() => navigate("/chat")}>Start Chat</button>
+                            onClick={() => onChatStart()}>Start Chat</button>
                     </>
                     }
                         

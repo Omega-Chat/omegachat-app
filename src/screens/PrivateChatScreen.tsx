@@ -1,21 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
+import { useLocation } from 'react-router';
+// import ElgamalService from '../services/ElgamalService';
+// import ChatService from '../services/ChatService';
+// import { CreateChat } from '../use_cases/messages/CreateChat';
 
 interface Message {
   text: string;
   isUser: boolean;
 }
 
-interface ChatProps {
-  messages: Message[];
-  recipientName: string;
-}
-
-const Chat: React.FC<ChatProps> = ({ messages: initialMessages, recipientName }) => {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+export default function PrivateChatScreen() {
+  
+  const location = useLocation();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const topBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+
+  }, [messages]);
 
   const sendMessage = () => {
     if (inputValue.trim() !== '') {
@@ -34,11 +42,6 @@ const Chat: React.FC<ChatProps> = ({ messages: initialMessages, recipientName })
     setInputValue(event.target.value);
   };
 
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
 
   const chatContainerStyle: React.CSSProperties = {
     display: 'flex',
@@ -125,7 +128,7 @@ const Chat: React.FC<ChatProps> = ({ messages: initialMessages, recipientName })
   return (
     <div style={chatContainerStyle}>
       <div style={topBarStyle} ref={topBarRef}>
-        <div style={recipientNameStyle}>{recipientName}</div>
+        <div style={recipientNameStyle}>{location.state.recipient.name}</div>
         <hr style={{ width: '100%' }} />
       </div>
 
@@ -160,5 +163,3 @@ const Chat: React.FC<ChatProps> = ({ messages: initialMessages, recipientName })
     </div>
   );
 };
-
-export default Chat;

@@ -30,12 +30,11 @@ export default function HomeChatScreen() {
 	useEffect(() => {
 		let keys = CryptographyTest();
 		fetchall.execute().then((data) => {
-			let filteredUsers = RemoveUserByName(data, location.state.user.name);
+			let filteredUsers = RemoveUserByName(data, location.state.sender.name);
 			setOnlineUserList(filteredUsers);
 		})
-		updatepubkey.execute(location.state.user._id, keys?.publicKey)
+		updatepubkey.execute(location.state.sender._id, keys?.publicKey)
 		
-
 	}, []);
 
 	function RemoveUserByName(usersArray: User[], userName: string) {
@@ -80,7 +79,7 @@ export default function HomeChatScreen() {
 
 	async function LeaveChat() {
 		try {
-			const exitedUser = await exitchat.execute(location.state.user._id);
+			const exitedUser = await exitchat.execute(location.state.sender._id);
 			console.log(exitedUser)
 
 			navigate("/");
@@ -115,10 +114,12 @@ export default function HomeChatScreen() {
 					backgroundColor: "black" 
 				}}/>
 				<div className="itens-list">
-					{onlineUserList?.map((doc, index) =>
-						<UserChatCard 
-							data={doc}
+					{onlineUserList?.map((user, index) =>
+						<UserChatCard
 							key={index}
+							data={user}
+							onChatStart={() => navigate("/private", {state: {recipient: user}})}
+
 							/>
 						)	
 					}

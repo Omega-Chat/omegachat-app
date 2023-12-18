@@ -18,7 +18,7 @@ export default function LoginScreen() {
         try {
                 const loggeduser = await loginUser.execute(email, password);
 
-                navigate("/chat", {state: {user: loggeduser}});
+                navigate("/chat", {state: {sender: loggeduser}});
 
         } catch (error: any) {
             console.log(error)
