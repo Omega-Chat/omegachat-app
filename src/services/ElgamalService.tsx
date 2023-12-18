@@ -103,18 +103,15 @@ export default class ElgamalService {
 		}
 	}
 
-	encryptation(plainText: string, pubkey: ElGamalPublicKey): CipherChar[] {
+	encryptation(plainText: string, pubkey: ElGamalPublicKey): string {
 		let bValue: bigint;
 		let c1;
 		let c2;
-		let cipherChar: CipherChar = {
-			c1: 0,
-			c2: 0
-		}
+		let cipherChar: CipherChar;
 
 		const unicodeArray = this.getUnicodeValues(plainText);
 
-		const encrypted: CipherChar[] = []
+		let encrypted = "";
 
 		for (let i = 0; i < unicodeArray.length; i++) {
 			do {
@@ -128,28 +125,29 @@ export default class ElgamalService {
 
 				c2 = Number(BigInt(unicodeArray[i]) * (BigInt(pubkey.e) ** bValue) % BigInt(pubkey.p))
 		
-				cipherChar = {
-					c1: c1,
-					c2: c2
-		
-				}		
+				cipherChar = {cipher: c1 + "," + c2}	
 				
-			} while (Number.isNaN(cipherChar.c1) || Number.isNaN(cipherChar.c2))
-
-			encrypted.push(cipherChar)
+			} while (Number.isNaN(cipherChar.cipher.charAt(0)) || Number.isNaN(cipherChar.cipher.charAt(2)))
+			
+			encrypted = encrypted + cipherChar.cipher + ";";
 		}
-
-			return encrypted;
-
+		return encrypted;
+		
 	}
-
-	decryptation(cipherText: CipherChar[], keys: ElGamalKeys): string {
-
+	
+	decryptation(cipherText: string, keys: ElGamalKeys): string {
+		
 		const decrypted = [];
-
-		for (let i = 0; i < cipherText.length; i++) {
-			const xValue = (BigInt(cipherText[i].c1) ** keys.privateKey) % BigInt(keys.publicKey.p);
-			const decryptedChar = Number(BigInt(cipherText[i].c2) * (xValue ** (BigInt(keys.publicKey.p) - BigInt(2))) % BigInt(keys.publicKey.p))
+		const chipher = cipherText.split(";");
+		chipher.pop()
+		
+		for (let i = 0; i < chipher.length; i++) {
+			
+			const c1 = Number(chipher[i].split(",")[0]);
+			const c2 = Number(chipher[i].split(",")[1]);
+			
+			const xValue = (BigInt(c1) ** keys.privateKey) % BigInt(keys.publicKey.p);
+			const decryptedChar = Number(BigInt(c2) * (xValue ** (BigInt(keys.publicKey.p) - BigInt(2))) % BigInt(keys.publicKey.p))
 			decrypted.push(decryptedChar)
 		}
 

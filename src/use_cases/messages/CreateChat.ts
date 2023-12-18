@@ -1,7 +1,7 @@
 import { Chat } from "../../entities/Chat";
 import ChatService from "../../services/ChatService";
 
-export class FindChat {
+export class CreateChat {
 
     constructor(private readonly chatService: ChatService) {
         this.chatService = chatService

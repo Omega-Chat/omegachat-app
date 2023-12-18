@@ -11,6 +11,5 @@ export interface ElGamalKeys {
 }
 
 export interface CipherChar {
-    c1: number,
-    c2: number
+    cipher: string
 }
