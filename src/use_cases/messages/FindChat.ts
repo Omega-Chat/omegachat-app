@@ -9,7 +9,7 @@ export class FindChat {
 
     async execute(id_user1: string , id_user2: string): Promise<Chat | null> {
 
-        const createdChat = await this.chatService.findByUser(id_user1, id_user2);
+        const createdChat = await this.chatService.findChatByUsers(id_user1, id_user2);
 
         return createdChat;
 

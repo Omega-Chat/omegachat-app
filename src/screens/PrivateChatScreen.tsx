@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useLocation } from 'react-router';
 // import ElgamalService from '../services/ElgamalService';
-// import ChatService from '../services/ChatService';
-// import { CreateChat } from '../use_cases/messages/CreateChat';
+ import ChatService from '../services/ChatService';
+ import { CreateChat } from '../use_cases/messages/CreateChat';
+import { AddMessageToChat } from '../use_cases/messages/AddMessage';
+import { useNavigate } from "react-router-dom";
 
 interface Message {
   text: string;
@@ -17,25 +19,50 @@ export default function PrivateChatScreen() {
   const [inputValue, setInputValue] = useState<string>('');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const topBarRef = useRef<HTMLDivElement>(null);
+  const chat = new CreateChat(new ChatService)
+  const addMessage = new AddMessageToChat(new ChatService) 
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    };
+
+    const initializeChat = async () => {
+      try {
+        const createdChat = await chat.execute(location.state.sender._id, "657e703fca311d986e7d06d7" ); // Você pode passar parâmetros, se necessário
+        navigate("/chats")
+        console.log('Chat criado:', createdChat);
+      } catch (error) {
+        console.error('Erro ao criar o chat:',);
+      }
+    };
+    initializeChat();
 
   }, [messages]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
+
     if (inputValue.trim() !== '') {
       const newMessage: Message = {
         text: inputValue,
         isUser: true,
       };
 
+      try {
+        // Adicionar mensagem ao chat
+         await addMessage.execute(location.state.chatId, newMessage.text);
+         navigate("/${chatId}/messages")
+      } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+      }
+
       const updatedMessages = [...messages, newMessage];
       setMessages(updatedMessages); 
       setInputValue('');
+      
     }
+    
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +155,7 @@ export default function PrivateChatScreen() {
   return (
     <div style={chatContainerStyle}>
       <div style={topBarStyle} ref={topBarRef}>
-        <div style={recipientNameStyle}>{location.state.recipient.name}</div>
+        <div style={recipientNameStyle}>{"Lidia"}</div>
         <hr style={{ width: '100%' }} />
       </div>
 
