@@ -48,4 +48,20 @@ export default class ChatService {
         return responseJSON;
     }
 
+    async deletePrivateChat(chatId: string): Promise<boolean> {
+        const response = await fetch(`http://localhost:3000/api/chats/${chatId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        const responseStatus = response.status;
+        if (responseStatus !== 200) {
+            const responseJSON = await response.json();
+            throw new Error(responseJSON.message);
+        }
+        return true;
+    }
+
 }

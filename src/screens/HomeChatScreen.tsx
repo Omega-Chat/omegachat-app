@@ -11,6 +11,9 @@ import { FetchAll } from "../use_cases/users/FetchAll";
 import UserService from "../services/UserService";
 import { UpdatePubKey } from "../use_cases/users/UpdatePubKey";
 import { ExitChat } from "../use_cases/users/ExitChat";
+import { DeletePrivateChat } from "../use_cases/messages/DeletePrivateChat";
+import ChatService from "../services/ChatService";
+import { EnterChat } from "../use_cases/users/EnterChat";
 
 
 
@@ -18,6 +21,8 @@ const crypto = new ElgamalService();
 const fetchall = new FetchAll(new UserService())
 const updatepubkey = new UpdatePubKey(new UserService())
 const exitchat = new ExitChat(new UserService())
+const enterChat = new EnterChat(new UserService())
+const deleteChat = new DeletePrivateChat(new ChatService())
 
 
 export default function HomeChatScreen() {
@@ -33,6 +38,17 @@ export default function HomeChatScreen() {
 			let filteredUsers = RemoveUserByName(data, location.state.sender.name);
 			setOnlineUserList(filteredUsers);
 		})
+
+		const chatId = sessionStorage.getItem('ChatId');
+		if(chatId) {
+			deleteChat.execute(chatId);
+			sessionStorage.removeItem('ChatId');
+		}
+
+		enterChat.execute(location.state.sender._id);
+
+
+
 	}, []);
 
 	function executeOnce() {
@@ -43,7 +59,8 @@ export default function HomeChatScreen() {
 			let keys = CryptographyTest();
 			console.log("Keys Generated:", keys)
 			updatepubkey.execute(location.state.sender._id, keys?.publicKey);
-			setPrivateKey(String(keys?.privateKey))
+			
+			sessionStorage.setItem('privateKey', String(keys?.privateKey));
 
 			sessionStorage.setItem('hasExecuted', "true");
 		}
