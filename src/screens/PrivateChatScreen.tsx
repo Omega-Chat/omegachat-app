@@ -19,55 +19,41 @@ export default function PrivateChatScreen() {
 
 	const location = useLocation();
 	const [messages, setMessages] = useState<Message[]>([]);
-	const [chatId, setChatId] = useState<string | undefined>('')
+	const [senderMessages, setSenderMessages] = useState<Message[]>([]);
 	const [inputValue, setInputValue] = useState<string>('');
 	const chatEndRef = useRef<HTMLDivElement>(null);
 	const topBarRef = useRef<HTMLDivElement>(null);
 
 	function executeOnce() {
 
-		const hasExecuted = sessionStorage.getItem('hasExecuted');
+		const hasExecuted = sessionStorage.getItem('hasExecutedChat');
 	
 		if (!hasExecuted) {
-			const myArray: String[] = [];
-			localStorage.setItem('senderMessages', JSON.stringify(myArray));
+			createChat.execute(location.state.sender._id, location.state.recipient._id).then((newChat) => {
+				sessionStorage.setItem('ChatId', String(newChat?._id));
+			})
 
-			sessionStorage.setItem('hasExecuted', "true");
-		
+			sessionStorage.setItem('hasExecutedChat', "true");
 		}
 	}
 
 	executeOnce();
 
-
 	useEffect(() => {
-
 		if (chatEndRef.current) {
-		chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+			chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
 		}
 
-		// Fetch Chat
 		findChat.execute(location.state.sender._id, location.state.recipient._id).then((chat) => {
-
-			if(!chat){
-				console.log("No previous chat!")
-				createChat.execute(location.state.sender._id, location.state.recipient._id).then((newChat) => {
-					setChatId(newChat?._id)
-
-				})
-			} else {
-				console.log("Chat already exists!")
-				setChatId(chat._id)
+			if(chat) {
+				sessionStorage.setItem('ChatId', String(chat?._id));
 				getMessages(chat.msg_list)
-				
 			}
 		})
 
-		const retrievedArray = JSON.parse(localStorage.getItem('senderMessages') || '[]');
-		console.log(retrievedArray);
+		console.log(senderMessages)
 
-	}, []);
-
+	});
 
 	const doesElementExist = (array: Message[], attributeName: keyof Message, attributeValue: string | number) => {
 		return array.some(obj => obj[attributeName] === attributeValue);
@@ -76,10 +62,11 @@ export default function PrivateChatScreen() {
 	const getMessages = (msg_list: string[][]) => {
 
 		let newMessage: Message;
+		const privateKey = sessionStorage.getItem('privateKey');
 
 		const keys: ElGamalKeys = {
 			publicKey: location.state.sender.pub_key,
-			privateKey: BigInt(location.state.privateKey)
+			privateKey: BigInt(String(privateKey))
 		};
 
 		let senderPos = 0;
@@ -89,18 +76,19 @@ export default function PrivateChatScreen() {
 
 
 			if (msg_list[i][1] === location.state.sender._id){
+				console.log("Sender Message");
 
-				console.log("Sender Msg")
-
-				const existingArray = JSON.parse(localStorage.getItem('senderMessages') || '[]');
-				console.log(existingArray)
-				messages.push(existingArray[senderPos])
+				if (messages.length !== 0){
+					if(!doesElementExist(messages, "text", senderMessages[senderPos].text) ){
+	
+						messages.push(senderMessages[senderPos])
+					}
+				}
+				senderPos = senderPos + 1;
 				
 			} 
 			else {
-
-
-				console.log("Recipient Msg")
+				console.log("Recipient Message");
 				const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
 				
 				newMessage = {
@@ -121,9 +109,6 @@ export default function PrivateChatScreen() {
 
 	};
 
-
-
-
 	const handleMessage = () => {
 		const pub_key: ElGamalPublicKey = location.state.recipient.pub_key;
 		
@@ -133,11 +118,10 @@ export default function PrivateChatScreen() {
 				isUser: true,
 			};
 
-			const existingArray = JSON.parse(localStorage.getItem('senderMessages') || '[]');
-			existingArray.push(newMessage)
-			localStorage.setItem('senderMessages', JSON.stringify(existingArray));
+			senderMessages.push(newMessage)
 
 			const cipherText = crypto.encryptation(newMessage.text, pub_key)
+			const chatId = String(sessionStorage.getItem("ChatId"))
 			sendMessage.execute(chatId, cipherText, location.state.sender._id)
 
 			setInputValue('');
