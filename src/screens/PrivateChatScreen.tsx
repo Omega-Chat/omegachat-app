@@ -51,8 +51,6 @@ export default function PrivateChatScreen() {
 			}
 		})
 
-		console.log(senderMessages)
-
 	});
 
 	const doesElementExist = (array: Message[], attributeName: keyof Message, attributeValue: string | number) => {

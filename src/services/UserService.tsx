@@ -57,7 +57,23 @@ export default class UserService {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ online: newState })
+            body: JSON.stringify({ newState: newState })
+        })
+        const responseJSON = await response.json();
+        const responseStatus = response.status;
+        if (responseStatus !== 200) throw new Error(responseJSON.message);
+        return responseJSON;
+    }
+
+    async enterChat(user_id: string, newState: boolean| undefined): Promise<User> {
+
+        const response = await fetch(`http://localhost:3000/api/users/${user_id}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newState: newState })
         })
         const responseJSON = await response.json();
         const responseStatus = response.status;
