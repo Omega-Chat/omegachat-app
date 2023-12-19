@@ -1,7 +1,7 @@
 import { ElGamalPublicKey } from "./Elgamal";
 
 export interface User {
-    _id?: number,
+    _id?: string,
     email: string,
     name: string,
     password: string,

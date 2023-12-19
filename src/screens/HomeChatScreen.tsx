@@ -23,19 +23,35 @@ const exitchat = new ExitChat(new UserService())
 export default function HomeChatScreen() {
 
 	const location = useLocation();
+	const [privateKey, setPrivateKey] = useState<String>()
 	const navigate = useNavigate();
 
 	const [onlineUserList, setOnlineUserList] = useState<User[]>();
 
 	useEffect(() => {
-		let keys = CryptographyTest();
 		fetchall.execute().then((data) => {
 			let filteredUsers = RemoveUserByName(data, location.state.sender.name);
 			setOnlineUserList(filteredUsers);
 		})
-		updatepubkey.execute(location.state.sender._id, keys?.publicKey)
-		
 	}, []);
+
+	function executeOnce() {
+
+		const hasExecuted = sessionStorage.getItem('hasExecuted');
+	
+		if (!hasExecuted) {
+			let keys = CryptographyTest();
+			console.log("Keys Generated:", keys)
+			updatepubkey.execute(location.state.sender._id, keys?.publicKey);
+			setPrivateKey(String(keys?.privateKey))
+
+			sessionStorage.setItem('hasExecuted', "true");
+		}
+	}
+
+	executeOnce();
+
+
 
 	function RemoveUserByName(usersArray: User[], userName: string) {
 		// Find the index of the user with the specified name
@@ -52,23 +68,23 @@ export default function HomeChatScreen() {
 
 	function CryptographyTest() {
 		try {
+			
 			// Example usage:
 			const test_msg = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 			let keys: ElGamalKeys;
 			let decipherText;
+			let cipherText;
 
 			do {
 
 				keys = crypto.generateKeyPair();
 	
-				const cipherText = crypto.encryptation(test_msg, keys.publicKey)
-		
+				cipherText = crypto.encryptation(test_msg, keys.publicKey)
+				
 				decipherText = crypto.decryptation(cipherText, keys);
-
+				
 			} while (test_msg !== decipherText);
-
-			// console.log(decipherText);
-
+			
 			return keys;
 	
 
@@ -118,7 +134,7 @@ export default function HomeChatScreen() {
 						<UserChatCard
 							key={index}
 							data={user}
-							onChatStart={() => navigate("/private", {state: {recipient: user}})}
+							onChatStart={() => navigate("/private", {state: {sender: location.state.sender, recipient: user, privateKey: privateKey}})}
 
 							/>
 						)	

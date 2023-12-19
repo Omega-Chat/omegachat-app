@@ -1,192 +1,271 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane } from 'react-icons/fa';
 import { useLocation } from 'react-router';
-// import ElgamalService from '../services/ElgamalService';
- import ChatService from '../services/ChatService';
- import { CreateChat } from '../use_cases/messages/CreateChat';
-import { AddMessageToChat } from '../use_cases/messages/AddMessage';
-import { useNavigate } from "react-router-dom";
+import { Message } from '../entities/Chat';
+import ElgamalService from '../services/ElgamalService';
+import ChatService from '../services/ChatService';
+import { CreateChat } from '../use_cases/messages/CreateChat';
+import { FindChat } from '../use_cases/messages/FindChat';
+import { ElGamalKeys, ElGamalPublicKey } from '../entities/Elgamal';
+import { SendMessage } from '../use_cases/messages/SendMessage';
 
-interface Message {
-  text: string;
-  isUser: boolean;
-}
+
+const crypto = new ElgamalService();
+const createChat = new CreateChat(new ChatService());
+const findChat = new FindChat(new ChatService());
+const sendMessage = new SendMessage(new ChatService());
 
 export default function PrivateChatScreen() {
-  
-  const location = useLocation();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState<string>('');
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const topBarRef = useRef<HTMLDivElement>(null);
-  const chat = new CreateChat(new ChatService)
-  const addMessage = new AddMessageToChat(new ChatService) 
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    };
+	const location = useLocation();
+	const [messages, setMessages] = useState<Message[]>([]);
+	const [chatId, setChatId] = useState<string | undefined>('')
+	const [inputValue, setInputValue] = useState<string>('');
+	const chatEndRef = useRef<HTMLDivElement>(null);
+	const topBarRef = useRef<HTMLDivElement>(null);
 
-    const initializeChat = async () => {
-      try {
-        const createdChat = await chat.execute(location.state.sender._id, "657e703fca311d986e7d06d7" ); // Você pode passar parâmetros, se necessário
-        navigate("/chats")
-        console.log('Chat criado:', createdChat);
-      } catch (error) {
-        console.error('Erro ao criar o chat:',);
-      }
-    };
-    initializeChat();
+	function executeOnce() {
 
-  }, [messages]);
+		const hasExecuted = sessionStorage.getItem('hasExecuted');
+	
+		if (!hasExecuted) {
+			const myArray: String[] = [];
+			localStorage.setItem('senderMessages', JSON.stringify(myArray));
 
-  const sendMessage = async () => {
+			sessionStorage.setItem('hasExecuted', "true");
+		
+		}
+	}
 
-    if (inputValue.trim() !== '') {
-      const newMessage: Message = {
-        text: inputValue,
-        isUser: true,
-      };
-
-      try {
-        // Adicionar mensagem ao chat
-         await addMessage.execute(location.state.chatId, newMessage.text);
-         navigate("/${chatId}/messages")
-      } catch (error) {
-        console.error('Erro ao enviar mensagem:', error);
-      }
-
-      const updatedMessages = [...messages, newMessage];
-      setMessages(updatedMessages); 
-      setInputValue('');
-      
-    }
-    
-  };
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-  };
+	executeOnce();
 
 
-  const chatContainerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    padding: '0px',
-    height: '100vh',
-    overflowY: 'auto',
-    position: 'relative',
-    margin: '0',
-  };  
+	useEffect(() => {
 
-  const topBarStyle: React.CSSProperties = {
-    position: 'sticky',
-    top: '0',
-    width: '100%',
-    backgroundColor: 'white',
-    zIndex: 2,
-  };
+		if (chatEndRef.current) {
+		chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		}
 
-  const messageStyle: React.CSSProperties = {
-    margin: '5px 0',
-    padding: '10px',
-    borderRadius: '8px',
-    maxWidth: '70%',
-    wordWrap: 'break-word',
-  };
+		// Fetch Chat
+		findChat.execute(location.state.sender._id, location.state.recipient._id).then((chat) => {
 
-  const userMessageStyle: React.CSSProperties = {
-    alignSelf: 'flex-end',
-    backgroundColor: '#8a2be2',
-    color: 'white',
-  };
+			if(!chat){
+				console.log("No previous chat!")
+				createChat.execute(location.state.sender._id, location.state.recipient._id).then((newChat) => {
+					setChatId(newChat?._id)
 
-  const otherMessageStyle: React.CSSProperties = {
-    alignSelf: 'flex-start',
-    backgroundColor: '#C59DF7',
-    color: 'black',
-  };
+				})
+			} else {
+				console.log("Chat already exists!")
+				setChatId(chat._id)
+				getMessages(chat.msg_list)
+				
+			}
+		})
 
-  const inputContainerStyle: React.CSSProperties = {
-    marginTop: 'auto',
-    display: 'flex',
-    alignItems: 'center',
-    borderTop: '1px solid #ccc',
-    padding: '10px 20px',
-    justifyContent: 'space-between',
-    position: 'fixed', 
-    bottom: '0',
-    background: 'white',
-    zIndex: 1,
-    width: '86%',
-  };
+		const retrievedArray = JSON.parse(localStorage.getItem('senderMessages') || '[]');
+		console.log(retrievedArray);
 
-  const inputStyle: React.CSSProperties = {
-    flex: '1',
-    padding: '10px',
-    borderRadius: '20px',
-    border: '1px solid #ccc',
-  };
+	}, []);
 
-  const sendButtonStyle: React.CSSProperties = {
-    marginLeft: '10px',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '24px',
-    color: '#8a2be2',
-  };
 
-  const recipientNameStyle: React.CSSProperties = {
-    fontFamily: 'Rubik',
-    fontSize: '20px',
-    fontWeight: 500,
-    lineHeight: '15px',
-    letterSpacing: '0em',
-    margin: 15,
-    textAlign: 'left',
-    marginBottom: '30px',
-    marginTop: '15px',
-    color:'#5034C4',
-  };
+	const doesElementExist = (array: Message[], attributeName: keyof Message, attributeValue: string | number) => {
+		return array.some(obj => obj[attributeName] === attributeValue);
+	};
 
-  return (
-    <div style={chatContainerStyle}>
-      <div style={topBarStyle} ref={topBarRef}>
-        <div style={recipientNameStyle}>{"Lidia"}</div>
-        <hr style={{ width: '100%' }} />
-      </div>
+	const getMessages = (msg_list: string[][]) => {
 
-      {messages.map((message, index) => (
-        <div
-          key={index}
-          style={
-            message.isUser ? { ...messageStyle, ...userMessageStyle } : { ...messageStyle, ...otherMessageStyle }
-          }
-        >
-          {message.text}
-        </div>
-      ))}
-      <div ref={chatEndRef} />
-      <div style={inputContainerStyle}>
-        <input
-          type="text"
-          placeholder="Escreva sua mensagem"
-          style={inputStyle}
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyPress={(event) => {
-            if (event.key === 'Enter') {
-              sendMessage();
-            }
-          }}
-        />
-        <button style={sendButtonStyle} onClick={sendMessage}>
-          <FaPaperPlane />
-        </button>
-      </div>
-    </div>
-  );
+		let newMessage: Message;
+
+		const keys: ElGamalKeys = {
+			publicKey: location.state.sender.pub_key,
+			privateKey: BigInt(location.state.privateKey)
+		};
+
+		let senderPos = 0;
+
+
+		for (let i = 0; i < msg_list.length; i++) {
+
+
+			if (msg_list[i][1] === location.state.sender._id){
+
+				console.log("Sender Msg")
+
+				const existingArray = JSON.parse(localStorage.getItem('senderMessages') || '[]');
+				console.log(existingArray)
+				messages.push(existingArray[senderPos])
+				
+			} 
+			else {
+
+
+				console.log("Recipient Msg")
+				const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
+				
+				newMessage = {
+					text: decryptedMsg,
+					isUser: false,
+				};
+
+				if(!doesElementExist(messages, "text", newMessage.text)){
+					
+					messages.push(newMessage)
+				}
+
+				
+			}
+
+
+		}
+
+	};
+
+
+
+
+	const handleMessage = () => {
+		const pub_key: ElGamalPublicKey = location.state.recipient.pub_key;
+		
+		if (inputValue.trim() !== '') {
+			const newMessage: Message = {
+				text: inputValue,
+				isUser: true,
+			};
+
+			const existingArray = JSON.parse(localStorage.getItem('senderMessages') || '[]');
+			existingArray.push(newMessage)
+			localStorage.setItem('senderMessages', JSON.stringify(existingArray));
+
+			const cipherText = crypto.encryptation(newMessage.text, pub_key)
+			sendMessage.execute(chatId, cipherText, location.state.sender._id)
+
+			setInputValue('');
+		}
+	};
+
+	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setInputValue(event.target.value);
+	};
+
+
+	const chatContainerStyle: React.CSSProperties = {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'flex-start',
+		padding: '0px',
+		height: '100vh',
+		overflowY: 'auto',
+		position: 'relative',
+		margin: '0',
+	};  
+
+	const topBarStyle: React.CSSProperties = {
+		position: 'sticky',
+		top: '0',
+		width: '100%',
+		backgroundColor: 'white',
+		zIndex: 2,
+	};
+
+	const messageStyle: React.CSSProperties = {
+		margin: '5px 0',
+		padding: '10px',
+		borderRadius: '8px',
+		maxWidth: '70%',
+		wordWrap: 'break-word',
+	};
+
+	const userMessageStyle: React.CSSProperties = {
+		alignSelf: 'flex-end',
+		backgroundColor: '#8a2be2',
+		color: 'white',
+	};
+
+	const otherMessageStyle: React.CSSProperties = {
+		alignSelf: 'flex-start',
+		backgroundColor: '#C59DF7',
+		color: 'black',
+	};
+
+	const inputContainerStyle: React.CSSProperties = {
+		marginTop: 'auto',
+		display: 'flex',
+		alignItems: 'center',
+		borderTop: '1px solid #ccc',
+		padding: '10px 20px',
+		justifyContent: 'space-between',
+		position: 'fixed', 
+		bottom: '0',
+		background: 'white',
+		zIndex: 1,
+		width: '86%',
+	};
+
+	const inputStyle: React.CSSProperties = {
+		flex: '1',
+		padding: '10px',
+		borderRadius: '20px',
+		border: '1px solid #ccc',
+	};
+
+	const sendButtonStyle: React.CSSProperties = {
+		marginLeft: '10px',
+		background: 'none',
+		border: 'none',
+		cursor: 'pointer',
+		fontSize: '24px',
+		color: '#8a2be2',
+	};
+
+	const recipientNameStyle: React.CSSProperties = {
+		fontFamily: 'Rubik',
+		fontSize: '20px',
+		fontWeight: 500,
+		lineHeight: '15px',
+		letterSpacing: '0em',
+		margin: 15,
+		textAlign: 'left',
+		marginBottom: '30px',
+		marginTop: '15px',
+		color:'#5034C4',
+	};
+
+	return (
+		<div style={chatContainerStyle}>
+		<div style={topBarStyle} ref={topBarRef}>
+			<div style={recipientNameStyle}>{location.state.recipient.name}</div>
+			<hr style={{ width: '100%' }} />
+		</div>
+
+		{messages.map((message, index) => (
+			<div
+			key={index}
+			style={
+				message.isUser ? { ...messageStyle, ...userMessageStyle } : { ...messageStyle, ...otherMessageStyle }
+			}
+			>
+			{message.text}
+			</div>
+		))}
+		<div ref={chatEndRef} />
+		<div style={inputContainerStyle}>
+			<input
+			type="text"
+			placeholder="Escreva sua mensagem"
+			style={inputStyle}
+			value={inputValue}
+			onChange={handleInputChange}
+			onKeyPress={(event) => {
+				if (event.key === 'Enter') {
+					handleMessage();
+				}
+			}}
+			/>
+			<button style={sendButtonStyle} onClick={handleMessage}>
+			<FaPaperPlane />
+			</button>
+		</div>
+		</div>
+	);
 };
