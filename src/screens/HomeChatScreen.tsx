@@ -105,57 +105,91 @@ export default function HomeChatScreen() {
 		}
 	}
 
-
+	async function ToGroup() {
+		navigate("/group");
+	}
 
 	return (
 		<div className="container">
-            <h1 
-				style={{
-					textAlign: "left",
-					font: "icon",
-					fontSize: 40,
-					color: primary}}>Chat</h1>
-			<div>
-				<h3 
-					style={{
-						textAlign: "left",
-						font: "icon",
-						marginTop: "5%",
-						marginLeft: "5%",
-						fontSize: 20,
-						fontWeight: "bold",
-						color: primary}}>Online Users</h3>
-				<hr style={{
-					height: 1,
-					backgroundColor: "black" 
-				}}/>
-				<div className="itens-list">
-					{onlineUserList?.map((user, index) =>
-						<UserChatCard
-							key={index}
-							data={user}
-							onChatStart={() => navigate("/private", {state: {sender: location.state.sender, recipient: user, privateKey: privateKey}})}
-
-							/>
-						)	
-					}
-				</div>
-				<button
-					style={{
-						marginRight: "5%",
-						marginLeft: "6%",
-						marginTop: "100%",
-						height: 50,
-						width: 352,
-						backgroundColor: leaveChat,
-						color: "black",
-						fontWeight: "bold",
-						borderRadius: 5,
-						fontSize: 20
-
-					}}
-					onClick={LeaveChat}>Leave Chat</button>
+		  <div>
+			<h1
+			  style={{
+				textAlign: 'left',
+				font: 'icon',
+				fontSize: 40,
+				color: 'primary',
+			  }}
+			>
+			  Chat
+			</h1>
+			<h3
+			  style={{
+				textAlign: 'left',
+				font: 'icon',
+				marginTop: '5%',
+				marginLeft: '5%',
+				fontSize: 20,
+				fontWeight: 'bold',
+				color: 'primary',
+			  }}
+			>
+			  Online Users
+			</h3>
+			<hr style={{ height: 1, backgroundColor: 'black' }} />
+			<div className="itens-list">
+			  {onlineUserList?.map((user, index) => (
+				<UserChatCard
+				  key={index}
+				  data={user}
+				  onChatStart={() =>
+					navigate('/private', {
+					  state: { sender: location.state.sender, recipient: user, privateKey: privateKey },
+					})
+				  }
+				/>
+			  ))}
 			</div>
+			
+			<img
+			  src="src\screens\img\Vector.png" // Replace with your image path
+			  alt="Image Alt Text"
+			  style={{
+				width: '100px', // Adjust the width as needed
+				height: 'auto', // Maintain aspect ratio
+				display: 'block',
+				margin: '270px auto 0px auto', // Updated margin for positioning
+				marginLeft: 260,
+			  }}
+			  onClick={ToGroup}
+			/>
+			<p
+			  style={{
+				textAlign: 'center',
+				fontSize: 16,
+				color: 'gray',
+				marginLeft: 230,
+			  }}
+			>
+			  Chat em grupo
+			</p>
+			<button
+			  style={{
+				marginTop: '20px', // Position the button at the bottom of the page
+				height: 50,
+				width: 352,
+				backgroundColor: leaveChat,
+				color: 'black',
+				fontWeight: 'bold',
+				borderRadius: 5,
+				fontSize: 20,
+				display: 'block',
+				margin: '40px auto 5%', // Center the button with margin
+			  }}
+			  onClick={LeaveChat}
+			>
+			  Leave Chat
+			</button>
+		  </div>
 		</div>
-	)
-}
+	  );
+	}
