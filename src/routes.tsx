@@ -6,12 +6,12 @@ import GroupChatScreen from './screens/GroupChatScreen'
 // import PrivateChatScreen from './screens/PrivateChatScreen'
 // import GroupChatScreen from './screens/GroupChatScreen'
 
-const messages = [
-    { text: 'Olá! Como vai?', isUser: true },
-    { text: 'Tudo bem, e você?', isUser: false },
-    { text: 'Estou ótimo, obrigado! Gostaria de saber que horas vc sai para que possamos marcar algo para se encontrar', isUser: true },
+//const messages = [
+  //  { text: 'Olá! Como vai?', isUser: true },
+    //{ text: 'Tudo bem, e você?', isUser: false },
+    //{ text: 'Estou ótimo, obrigado! Gostaria de saber que horas vc sai para que possamos marcar algo para se encontrar', isUser: true },
   
-  ];
+  //];
 
 export const router = createBrowserRouter([
     {
@@ -24,10 +24,10 @@ export const router = createBrowserRouter([
     },
     {
         path: '/private',
-        element: <PrivateChatScreen messages={messages} recipientName='Lídia'/>
-    }
-    // {
-    //     path: '/group',
-    //     element: <GroupChatScreen/>
-    // }
+        element: <PrivateChatScreen />
+    },
+     {
+         path: '/group',
+         element: <GroupChatScreen/>
+     }
   ])

@@ -1,6 +1,6 @@
 import { RouterProvider } from "react-router"
 import { router } from "./routes"
-import Chat from "./screens/PrivateChatScreen";
+//import Chat from "./screens/PrivateChatScreen";
 
 
 function App() {

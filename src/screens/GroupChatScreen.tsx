@@ -7,12 +7,10 @@ interface Message {
   senderName: string;
 }
 
-interface ChatProps {
-  messages: Message[];
-}
 
-const GroupChat: React.FC<ChatProps> = ({ messages: initialMessages }) => {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+export default function GroupChatScreen() {
+
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const topBarRef = useRef<HTMLDivElement>(null);
@@ -159,6 +157,11 @@ const GroupChat: React.FC<ChatProps> = ({ messages: initialMessages }) => {
           style={inputStyle}
           value={inputValue}
           onChange={handleInputChange}
+          onKeyPress={(event) => {
+            if (event.key === 'Enter') {
+              sendMessage();
+            }
+          }}
         />
         <button style={sendButtonStyle} onClick={sendMessage}>
           <FaPaperPlane />
@@ -167,5 +170,3 @@ const GroupChat: React.FC<ChatProps> = ({ messages: initialMessages }) => {
     </div>
   );
 };
-
-export default GroupChat;
