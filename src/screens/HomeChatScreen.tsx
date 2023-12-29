@@ -1,6 +1,6 @@
 // import { useNavigate } from "react-router-dom";
 // import {useEffect, useState} from "react";
-import { leaveChat, primary } from "../theme/colors";
+import { leaveChat} from "../theme/colors";
 import { User } from "../entities/User";
 import UserChatCard from "../components/userChatCard";
 import ElgamalService from "../services/ElgamalService";
@@ -28,7 +28,6 @@ const deleteChat = new DeletePrivateChat(new ChatService())
 export default function HomeChatScreen() {
 
 	const location = useLocation();
-	const [privateKey, setPrivateKey] = useState<String>()
 	const navigate = useNavigate();
 
 	const [onlineUserList, setOnlineUserList] = useState<User[]>();
@@ -53,9 +52,13 @@ export default function HomeChatScreen() {
 
 	function executeOnce() {
 
+		sessionStorage.removeItem('hasExecutedChat');
+		sessionStorage.removeItem('senderMessages');
+		sessionStorage.removeItem('publicKey');
+
 		const hasExecuted = sessionStorage.getItem('hasExecuted');
 	
-		if (!hasExecuted) {
+		if (hasExecuted == 'false' || !hasExecuted) {
 			let keys = CryptographyTest();
 			console.log("Keys Generated:", keys)
 			updatepubkey.execute(location.state.sender._id, keys?.publicKey);
@@ -160,7 +163,7 @@ export default function HomeChatScreen() {
 				  data={user}
 				  onChatStart={() =>
 					navigate('/private', {
-					  state: { sender: location.state.sender, recipient: user, privateKey: privateKey },
+					  state: { sender: location.state.sender, recipient: user},
 					})
 				  }
 				/>

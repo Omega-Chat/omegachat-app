@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { primary } from "../theme/colors";
 import UserService from "../services/UserService";
 import Login from "../use_cases/users/Login";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const loginUser = new Login(new UserService());
 
@@ -12,6 +12,12 @@ export default function LoginScreen() {
     const [password, setPassword] = useState("");
 
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		sessionStorage.removeItem('privateKey');
+		sessionStorage.removeItem('hasExecuted');
+
+	}, []);
 
 	async function SendData() {
 

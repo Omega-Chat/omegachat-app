@@ -30,7 +30,7 @@ export default class ChatService {
     }
 
     async sendMessage(chatId: string | undefined, message: string, sender: string): Promise<Chat | null> {
-        console.log(chatId, message, sender)
+
         const response = await fetch(`http://localhost:3000/api/chats/${chatId}/messages`, {
             method: 'POST',
             headers: {

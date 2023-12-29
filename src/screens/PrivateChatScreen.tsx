@@ -15,11 +15,14 @@ const createChat = new CreateChat(new ChatService());
 const findChat = new FindChat(new ChatService());
 const sendMessage = new SendMessage(new ChatService());
 
+
 export default function PrivateChatScreen() {
 
 	const location = useLocation();
+
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [senderMessages, setSenderMessages] = useState<Message[]>([]);
+
 	const [inputValue, setInputValue] = useState<string>('');
 	const chatEndRef = useRef<HTMLDivElement>(null);
 	const topBarRef = useRef<HTMLDivElement>(null);
@@ -27,6 +30,7 @@ export default function PrivateChatScreen() {
 	function executeOnce() {
 
 		const hasExecuted = sessionStorage.getItem('hasExecutedChat');
+		sessionStorage.setItem('publicKey', JSON.stringify(location.state.recipient.pub_key));
 	
 		if (!hasExecuted) {
 			createChat.execute(location.state.sender._id, location.state.recipient._id).then((newChat) => {
@@ -39,72 +43,85 @@ export default function PrivateChatScreen() {
 
 	executeOnce();
 
-	useEffect(() => {
-		if (chatEndRef.current) {
-			chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+
+	// Function to load messages from sessionStorage
+	const loadMessagesFromStorage = () => {
+		const storedMessages = sessionStorage.getItem('senderMessages');
+		if (storedMessages) {
+			setSenderMessages(JSON.parse(storedMessages));
 		}
+	  };
 
-		findChat.execute(location.state.sender._id, location.state.recipient._id).then((chat) => {
-			if(chat) {
-				sessionStorage.setItem('ChatId', String(chat?._id));
-				getMessages(chat.msg_list)
-			}
-		})
 
-	});
-
-	const doesElementExist = (array: Message[], attributeName: keyof Message, attributeValue: string | number) => {
-		return array.some(obj => obj[attributeName] === attributeValue);
+	// Function to save messages to sessionStorage
+	const saveMessagesToStorage = (messagesToSave: Message[]) => {
+		sessionStorage.setItem('senderMessages', JSON.stringify(messagesToSave));
 	};
+
+
+	useEffect(() => {
+			const interval = setInterval(() => {
+
+				saveMessagesToStorage(senderMessages);
+				loadMessagesFromStorage();
+
+				// Caso exista um chat, retorne seu conteudo
+				findChat.execute(location.state.sender._id, location.state.recipient._id).then((chat) => {
+					if(chat) {
+						sessionStorage.setItem('ChatId', String(chat?._id));
+						getMessages(chat.msg_list)
+					}
+				})
+	
+			  }, 100000000);
+		  
+			  return () => clearInterval(interval);
+	
+		});
+
+	// const doesElementExist = (array: Message[], attributeName: keyof Message, attributeValue: string | number) => {
+	// 	return array.some(obj => obj[attributeName] === attributeValue);
+	// };
 
 	const getMessages = (msg_list: string[][]) => {
 
-		let newMessage: Message;
 		const privateKey = sessionStorage.getItem('privateKey');
+		const tempArray: Message[] = [];
 
-		const keys: ElGamalKeys = {
-			publicKey: location.state.sender.pub_key,
-			privateKey: BigInt(String(privateKey))
-		};
+		if(privateKey) {
 
-		let senderPos = 0;
+			const keys: ElGamalKeys = {
+				publicKey: location.state.sender.pub_key,
+				privateKey: BigInt(privateKey)
+			};
 
+			let senderPos = 0;
 
-		for (let i = 0; i < msg_list.length; i++) {
+			for (let i = 0; i < msg_list.length; i++) {
 
-
-			if (msg_list[i][1] === location.state.sender._id){
-				console.log("Sender Message");
-
-				if (messages.length !== 0){
-					if(!doesElementExist(messages, "text", senderMessages[senderPos].text) ){
-	
-						messages.push(senderMessages[senderPos])
-					}
-				}
-				senderPos = senderPos + 1;
 				
-			} 
-			else {
-				console.log("Recipient Message");
-				const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
-				
-				newMessage = {
-					text: decryptedMsg,
-					isUser: false,
-				};
-
-				if(!doesElementExist(messages, "text", newMessage.text)){
+				if (msg_list[i][1] === location.state.sender._id){
+		
+					tempArray.push(senderMessages[senderPos])
 					
-					messages.push(newMessage)
+					senderPos = senderPos + 1;
+					
+				} 
+				else {
+
+					const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
+					
+					let newMessage: Message = {
+						text: decryptedMsg,
+						isUser: false,
+					};
+
+					tempArray.push(newMessage)
+
 				}
-
-				
 			}
-
-
+			setMessages(tempArray)
 		}
-
 	};
 
 	const handleMessage = () => {
@@ -116,7 +133,7 @@ export default function PrivateChatScreen() {
 				isUser: true,
 			};
 
-			senderMessages.push(newMessage)
+			setSenderMessages([...senderMessages, newMessage])
 
 			const cipherText = crypto.encryptation(newMessage.text, pub_key)
 			const chatId = String(sessionStorage.getItem("ChatId"))
