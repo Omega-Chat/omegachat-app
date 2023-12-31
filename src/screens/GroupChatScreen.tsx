@@ -1,15 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane } from 'react-icons/fa';
-
-interface Message {
-  text: string;
-  isUser: boolean;
-  senderName: string;
-}
+import { FaPaperPlane, FaTimes } from 'react-icons/fa';
+import { Message } from '../entities/ChatGroup';
+import { useNavigate } from 'react-router';
 
 
 export default function GroupChatScreen() {
 
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -27,6 +24,10 @@ export default function GroupChatScreen() {
       setMessages(updatedMessages); 
       setInputValue('');
     }
+  };
+
+  const closeChat = () => {
+   //navigate("/chat");
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,10 +132,20 @@ export default function GroupChatScreen() {
     color:'#5034C4',
   };
 
+  const closeButtonStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    cursor: 'pointer',
+    fontSize: '24px',
+    color: '#8a2be2',
+  };
+
   return (
     <div style={chatContainerStyle}>
       <div style={topBarStyle} ref={topBarRef}>
         <div style={recipientNameStyle}>{"Grupo de Segurança"}</div>
+        <FaTimes style={closeButtonStyle} onClick={closeChat} />
         <hr style={{ width: '100%', color: 'black' }} />
       </div>
       {messages.map((message, index) => (

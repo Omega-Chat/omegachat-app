@@ -4,9 +4,9 @@ import ChatGroupService from "../../services/ChatGroupService";
 export class AddMessageToGroupChat {
   constructor(private readonly chatGroupService: ChatGroupService) {}
 
-  async execute(groupId: string, message: string): Promise<ChatGroup | null> {
+  async execute(groupId: string, message: string, sender: string): Promise<ChatGroup | null> {
     
-      const updatedGroup = await this.chatGroupService.addMessageToGroupChat(groupId, message);
+      const updatedGroup = await this.chatGroupService.addMessageToGroupChat(groupId, message, sender);
       return updatedGroup;
   }
 }

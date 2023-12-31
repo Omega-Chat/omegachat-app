@@ -3,3 +3,9 @@ export interface ChatGroup {
   userIds: string[]
     msg_list: string[][];
   }
+
+  export interface Message {
+    text: string;
+    isUser: boolean;
+    senderName: string;
+  }
