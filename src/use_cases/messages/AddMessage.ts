@@ -7,8 +7,8 @@ export class AddMessageToChat {
         this.chatService = chatService;
     }
 
-    async execute(chatId: string, message: string): Promise<Chat | null> {
-        const updatedChat = await this.chatService.addMessageToChat(chatId, message);
+    async execute(chatId: string, message: string, sender: string): Promise<Chat | null> {
+        const updatedChat = await this.chatService.sendMessage(chatId, message, sender);
 
         return updatedChat;
     }

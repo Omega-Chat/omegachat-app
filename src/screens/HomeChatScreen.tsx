@@ -14,7 +14,8 @@ import { ExitChat } from "../use_cases/users/ExitChat";
 import { DeletePrivateChat } from "../use_cases/messages/DeletePrivateChat";
 import ChatService from "../services/ChatService";
 import { EnterChat } from "../use_cases/users/EnterChat";
-
+import ChatGroupService from "../services/ChatGroupService";
+import { CreateChatGroup } from "../use_cases/messages/CreateChatGroup";
 
 
 const crypto = new ElgamalService();
@@ -23,6 +24,7 @@ const updatepubkey = new UpdatePubKey(new UserService())
 const exitchat = new ExitChat(new UserService())
 const enterChat = new EnterChat(new UserService())
 const deleteChat = new DeletePrivateChat(new ChatService())
+const createGroupChat = new CreateChatGroup(new ChatGroupService())
 
 
 export default function HomeChatScreen() {
@@ -31,9 +33,11 @@ export default function HomeChatScreen() {
 	const navigate = useNavigate();
 
 	const [onlineUserList, setOnlineUserList] = useState<User[]>();
+	const [allOnlineUsers, setAllOnlineUsers] = useState<User[]>([]);
 
 	useEffect(() => {
 		fetchall.execute().then((data) => {
+			setAllOnlineUsers(data);
 			let filteredUsers = RemoveUserByName(data, location.state.sender.name);
 			setOnlineUserList(filteredUsers);
 		})
@@ -126,7 +130,23 @@ export default function HomeChatScreen() {
 	}
 
 	async function ToGroup() {
-		navigate("/group");
+		try {
+			const userIds = allOnlineUsers.map(user => user._id) as string[];
+		
+			if (userIds && userIds.length > 0) {
+			  
+			  // Chamada para criar o chat em grupo
+			  const newGroupChat = await createGroupChat.execute(userIds);
+		
+			  // Verificar se a criação foi bem-sucedida
+			  if (newGroupChat) {
+				console.log('Chat group created:', newGroupChat);
+				 navigate(`/group`);
+			  } 
+			}
+		  } catch (error) {
+			console.error('Error while creating chat group', error);
+		  }
 	}
 
 	return (

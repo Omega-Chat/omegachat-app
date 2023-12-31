@@ -4,7 +4,7 @@ import { User } from "../entities/User";
 export default class UserService {
 
     async login(email: string, password: string): Promise<User> {
-        const response = await fetch(`http://localhost:3000/api/loginUser`, {
+        const response = await fetch(`http://localhost:8081/api/loginUser`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -24,7 +24,7 @@ export default class UserService {
 
     async fetchAll(): Promise<User[]> {
         const response = await fetch(
-          `http://localhost:3000/api/users`
+          `http://localhost:8081/api/users`
         );
     
         const responseJSON = await response.json();
@@ -35,7 +35,7 @@ export default class UserService {
 
     async updatePubKey(user_id: string, pub_key: ElGamalPublicKey|undefined): Promise<User> {
         
-        const response = await fetch(`http://localhost:3000/api/users/${user_id}/pub_key`, {
+        const response = await fetch(`http://localhost:8081/api/users/${user_id}/pub_key`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -51,7 +51,7 @@ export default class UserService {
     
     async exitChat(user_id: string, newState: boolean| undefined): Promise<User> {
 
-        const response = await fetch(`http://localhost:3000/api/users/${user_id}`, {
+        const response = await fetch(`http://localhost:8081/api/users/${user_id}`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -67,7 +67,7 @@ export default class UserService {
 
     async enterChat(user_id: string, newState: boolean| undefined): Promise<User> {
 
-        const response = await fetch(`http://localhost:3000/api/users/${user_id}`, {
+        const response = await fetch(`http://localhost:8081/api/users/${user_id}`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
