@@ -51,7 +51,6 @@ export default function HomeChatScreen() {
 		enterChat.execute(location.state.sender._id);
 
 
-
 	}, []);
 
 	function executeOnce() {
@@ -130,23 +129,11 @@ export default function HomeChatScreen() {
 	}
 
 	async function ToGroup() {
-		try {
-			const userIds = allOnlineUsers.map(user => user._id) as string[];
-		
-			if (userIds && userIds.length > 0) {
-			  
-			  // Chamada para criar o chat em grupo
-			  const newGroupChat = await createGroupChat.execute(userIds);
-		
-			  // Verificar se a criação foi bem-sucedida
-			  if (newGroupChat) {
-				console.log('Chat group created:', newGroupChat);
-				 navigate(`/group`);
-			  } 
-			}
-		  } catch (error) {
-			console.error('Error while creating chat group', error);
-		  }
+		const currentUserID = location.state.sender._id;
+		const userIds = [...allOnlineUsers.map(user => user._id), currentUserID];
+		navigate('/group', {
+			state: { sender: location.state.sender, user_ids: userIds},
+		  })
 	}
 
 	return (

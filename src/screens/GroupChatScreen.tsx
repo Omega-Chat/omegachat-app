@@ -1,44 +1,152 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaPaperPlane, FaTimes } from 'react-icons/fa';
 import { Message } from '../entities/ChatGroup';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
+import { CreateChatGroup } from "../use_cases/messages/CreateChatGroup";
+import ChatGroupService from "../services/ChatGroupService";
+import { AddMessageToGroupChat } from '../use_cases/messages/AddMessageToGroup';
+import { GetGroupChatMessages } from '../use_cases/messages/GetGroupChatMessages';
 
+const createGroupChat = new CreateChatGroup(new ChatGroupService())
+const addMessage = new AddMessageToGroupChat(new ChatGroupService())
+const getGroupMessages = new GetGroupChatMessages(new ChatGroupService())
 
 export default function GroupChatScreen() {
 
   const navigate = useNavigate();
+  const location = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [senderMessages, setSenderMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const topBarRef = useRef<HTMLDivElement>(null);
 
-  const sendMessage = () => {
-    if (inputValue.trim() !== '') {
-      const newMessage: Message = {
-        text: inputValue,
-        isUser: true,
-        senderName: 'Nome do Usuário', 
-      };
 
-      const updatedMessages = [...messages, newMessage];
-      setMessages(updatedMessages); 
-      setInputValue('');
-    }
-  };
+  function executeOnce() {
+
+		const hasExecuted = sessionStorage.getItem('hasExecutedChat');
+		//sessionStorage.setItem('publicKey', JSON.stringify(location.state.recipient.pub_key));
+	
+		if (!hasExecuted) {
+			createGroupChat.execute(location.state.user_ids).then((newGroupChat) => {
+				sessionStorage.setItem('GroupChatId', String(newGroupChat?._id));
+			})
+
+			sessionStorage.setItem('hasExecutedChat', "true");
+		}
+	}
+
+  executeOnce()
+
 
   const closeChat = () => {
-   //navigate("/chat");
+    navigate('/chat', {
+			state: { sender: location.state.sender,},
+		  })
   };
+
+
+  // Function to load messages from sessionStorage
+	const loadMessagesFromStorage = () => {
+		const storedMessages = sessionStorage.getItem('senderMessages');
+		if (storedMessages) {
+			setSenderMessages(JSON.parse(storedMessages));
+		}
+	  };
+
+    // Function to save messages to sessionStorage
+	const saveMessagesToStorage = (messagesToSave: Message[]) => {
+		sessionStorage.setItem('senderMessages', JSON.stringify(messagesToSave));
+	};
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
 
+  const handleMessage = () => {
+		//const pub_key: ElGamalPublicKey = location.state.recipient.pub_key;
+		
+		if (inputValue.trim() !== '') {
+			const newMessage: Message = {
+				text: inputValue,
+				isUser: true,
+        senderName: 'Teste'
+			};
+
+			setSenderMessages([...senderMessages, newMessage])
+
+			//const cipherText = crypto.encryptation(newMessage.text, pub_key)
+			const chatId = String(sessionStorage.getItem("GroupChatId"))
+			addMessage.execute(chatId, newMessage.text, location.state.sender._id)
+
+			setInputValue('');
+		}
+	};
+
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
+    const interval = setInterval(() => {
+
+      saveMessagesToStorage(senderMessages);
+      loadMessagesFromStorage();
+
+      // Caso exista um chat, retorne seu conteudo
+      const chatId = String(sessionStorage.getItem("GroupChatId"))
+      getGroupMessages.execute(chatId).then((message) => {
+        if(message) {
+          getMessages(message)
+        }
+      })
+
+      }, 100000000);
+    
+      return () => clearInterval(interval);
+
+   // if (chatEndRef.current) {
+     // chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    //}
+  });
+
+  const getMessages = (msg_list: string[][]) => {
+
+		const privateKey = sessionStorage.getItem('privateKey');
+		const tempArray: Message[] = [];
+
+		if(privateKey) {
+
+			//const keys: ElGamalKeys = {
+				//publicKey: location.state.sender.pub_key,
+				//privateKey: BigInt(privateKey)
+			//};
+
+			let senderPos = 0;
+
+			for (let i = 0; i < msg_list.length; i++) {
+
+				
+				if (msg_list[i][1] === location.state.sender._id){
+		
+					tempArray.push(senderMessages[senderPos])
+					
+					senderPos = senderPos + 1;
+					
+				} 
+				else {
+
+					//const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
+					
+					let newMessage: Message = {
+						text: msg_list[i][0],
+						isUser: false,
+            senderName: "Teste"
+					};
+
+					tempArray.push(newMessage)
+
+				}
+			}
+			setMessages(tempArray)
+		}
+	};
 
   const chatContainerStyle: React.CSSProperties = {
     display: 'flex',
@@ -170,11 +278,11 @@ export default function GroupChatScreen() {
           onChange={handleInputChange}
           onKeyPress={(event) => {
             if (event.key === 'Enter') {
-              sendMessage();
+              handleMessage();
             }
           }}
         />
-        <button style={sendButtonStyle} onClick={sendMessage}>
+        <button style={sendButtonStyle} onClick={handleMessage}>
           <FaPaperPlane />
         </button>
       </div>
