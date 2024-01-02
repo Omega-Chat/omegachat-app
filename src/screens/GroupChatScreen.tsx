@@ -124,6 +124,8 @@ export default function GroupChatScreen() {
 								continue
 							} else {
 								if(msg_list[i][1] === location.state.sender._id){
+
+									const user = await findUser.execute(msg_list[i][2]);
 									
 		
 									const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
