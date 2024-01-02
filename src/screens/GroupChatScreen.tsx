@@ -6,10 +6,15 @@ import { CreateChatGroup } from "../use_cases/messages/CreateChatGroup";
 import ChatGroupService from "../services/ChatGroupService";
 import { AddMessageToGroupChat } from '../use_cases/messages/AddMessageToGroup';
 import { GetGroupChatMessages } from '../use_cases/messages/GetGroupChatMessages';
+import { FindUserById } from '../use_cases/users/FindUser';
+import  UserService  from '../services/UserService'
+import ElgamalService from '../services/ElgamalService';
 
 const createGroupChat = new CreateChatGroup(new ChatGroupService())
 const addMessage = new AddMessageToGroupChat(new ChatGroupService())
 const getGroupMessages = new GetGroupChatMessages(new ChatGroupService())
+const findUser = new FindUserById(new UserService())
+const crypto = new ElgamalService();
 
 export default function GroupChatScreen() {
 
@@ -63,21 +68,44 @@ export default function GroupChatScreen() {
     setInputValue(event.target.value);
   };
 
-  const handleMessage = () => {
-		//const pub_key: ElGamalPublicKey = location.state.recipient.pub_key;
-		
-		if (inputValue.trim() !== '') {
-			const newMessage: Message = {
-				text: inputValue,
-				isUser: true,
-        senderName: 'Teste'
-			};
+  const handleMessage = async () => {
 
-			setSenderMessages([...senderMessages, newMessage])
+    const encryptedMessages = [];
+    const userIds = location.state.user_ids
 
-			//const cipherText = crypto.encryptation(newMessage.text, pub_key)
-			const chatId = String(sessionStorage.getItem("GroupChatId"))
-			addMessage.execute(chatId, newMessage.text, location.state.sender._id)
+    if (inputValue.trim() !== '') {
+      const newMessage: Message = {
+        text: inputValue,
+        isUser: true,
+        senderName: location.state.sender.name
+      };
+      
+      setSenderMessages([...senderMessages, newMessage])
+
+      for (let i = 0; i < userIds.length; i++) {
+        console.log("id de usuario", userIds[i])
+        
+        const user = await findUser.execute(userIds[i]);
+        console.log("Usuario encontrado: ", user)
+        if (user && user.pub_key) {
+          const pub_key = user.pub_key;
+          const userId = user._id
+          console.log("Chave privada:", pub_key)
+          // Passo 2: Encripte a mensagem com a chave pública do usuário atual
+          const cipherText = crypto.encryptation(newMessage.text, pub_key);
+          encryptedMessages.push({ userId, cipherText });
+        }
+      }
+
+      for (const encryptedMessage of encryptedMessages) {
+       // const { userId, cipherText } = encryptedMessage;
+        const chatId = String(sessionStorage.getItem('GroupChatId'));
+    
+        // Envie a mensagem encriptada para o usuário correspondente
+        //addMessage.execute(chatId, cipherText, userId);
+      }
+
+			
 
 			setInputValue('');
 		}
@@ -97,7 +125,7 @@ export default function GroupChatScreen() {
         }
       })
 
-      }, 100000000);
+      }, 1000);
     
       return () => clearInterval(interval);
 

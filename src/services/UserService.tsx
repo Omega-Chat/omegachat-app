@@ -82,6 +82,7 @@ export default class UserService {
     }
 
     async findUserById(userId: string): Promise<User> {
+        console.log(userId)
         const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
             method: 'GET',
             headers: {
@@ -89,6 +90,7 @@ export default class UserService {
                 'Content-Type': 'application/json'
             }
         });
+        
         const responseJSON = await response.json();
         const responseStatus = response.status;
         if (responseStatus !== 200) throw new Error(responseJSON.message);
