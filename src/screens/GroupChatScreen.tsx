@@ -9,6 +9,7 @@ import { GetGroupChatMessages } from '../use_cases/messages/GetGroupChatMessages
 import { FindUserById } from '../use_cases/users/FindUser';
 import  UserService  from '../services/UserService'
 import ElgamalService from '../services/ElgamalService';
+import { ElGamalKeys } from '../entities/Elgamal';
 
 const createGroupChat = new CreateChatGroup(new ChatGroupService())
 const sendMessage = new AddMessageToGroupChat(new ChatGroupService())
@@ -96,42 +97,52 @@ export default function GroupChatScreen() {
 
 			if(privateKey) {
 
-				//const keys: ElGamalKeys = {
-					//publicKey: location.state.sender.pub_key,
-					//privateKey: BigInt(privateKey)
-				//};
+				
 
 				let senderPos = 0;
 
 				for (let i = 0; i < msg_list.length; i++) {
 
+					const user = await findUser.execute(msg_list[i][2]);
+
+					if(privateKey && user && user.pub_key){
+						const keys: ElGamalKeys = {
+							publicKey: user.pub_key,
+							privateKey: Number(privateKey)
+						};
 					
-					if (msg_list[i][1] === location.state.sender._id ){
+
+
+						if (msg_list[i][2] === location.state.sender._id ){
+				
+							tempArray.push(senderMessages[senderPos])
+							
+							senderPos = senderPos + 1;
+							
+						} 
+						else {
+							if(msg_list[i][2] === location.state.sender._id){
+								continue
+							} else {
+								if(msg_list[i][1] === location.state.sender._id){
+									
+		
+									const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
+									
+									let newMessage: Message = {
+										text: decryptedMsg,
+										isUser: false,
+										senderName: user.name
+									};
 			
-						tempArray.push(senderMessages[senderPos])
-						
-						senderPos = senderPos + 1;
-						
-					} 
-					else {
-						if(msg_list[i][2] === location.state.sender._id){
-							continue
-						} else {
-							
-							const user = await findUser.execute(msg_list[i][2]);
+									tempArray.push(newMessage)
 
-							//const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
-							
-							let newMessage: Message = {
-								text: msg_list[i][0],
-								isUser: false,
-								senderName: user.name
-							};
-	
-							tempArray.push(newMessage)
+								}
+
+								
+							}
+
 						}
-
-
 					}
 				}
 				setMessages(tempArray)
@@ -286,14 +297,18 @@ export default function GroupChatScreen() {
 			<hr style={{ width: '100%', color: 'black' }} />
 		</div>
 		{messages.map((message, index) => (
-			<div key={index}>
+		<div key={index}>
+			{message && ('isUser' in message) && (
 			<div style={message.isUser ? userMessageStyle : otherMessageStyle}>
 				{!message.isUser && <div style={senderNameStyle}>{message.senderName}</div>}
 				<div>
-				<span style={{ fontSize: '14px', fontFamily: 'Rubick', color: 'black' }}>{message.text}</span>
+				<span style={{ fontSize: '14px', fontFamily: 'Rubick', color: 'black' }}>
+					{message.text}
+				</span>
 				</div>
 			</div>
-			</div>
+			)}
+		</div>
 		))}
 		<div ref={chatEndRef} />
 
