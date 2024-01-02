@@ -97,22 +97,21 @@ export default function GroupChatScreen() {
 
 			if(privateKey) {
 
-				
-
 				let senderPos = 0;
 
 				for (let i = 0; i < msg_list.length; i++) {
 
-					const user = await findUser.execute(msg_list[i][2]);
+					const user = await findUser.execute(msg_list[i][1]);
+					console.log("O usuário encontrado na descripto é ", user._id)
 
 					if(privateKey && user && user.pub_key){
 						const keys: ElGamalKeys = {
 							publicKey: user.pub_key,
 							privateKey: Number(privateKey)
 						};
+
+						console.log("A chave na descripto é ", user.pub_key)
 					
-
-
 						if (msg_list[i][2] === location.state.sender._id ){
 				
 							tempArray.push(senderMessages[senderPos])
@@ -170,6 +169,7 @@ export default function GroupChatScreen() {
 
 				if (user && user.pub_key && user._id) {
 					// Passo 2: Encripte a mensagem com a chave pública do usuário atual
+					console.log("A chave pub dos usuers no encriptation é ", user.pub_key)
 					const cipherText = crypto.encryptation(newMessage.text, user.pub_key);
 					const chatId = String(sessionStorage.getItem('GroupChatId'));
 				
