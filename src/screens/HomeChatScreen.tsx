@@ -98,18 +98,9 @@ export default function HomeChatScreen() {
 			let decipherText;
 			let cipherText;
 
-			do {
+			keys = crypto.generateKeyPair();
 
-				keys = crypto.generateKeyPair();
-	
-				cipherText = crypto.encryptation(test_msg, keys.publicKey)
-				
-				decipherText = crypto.decryptation(cipherText, keys);
-				
-			} while (test_msg !== decipherText);
-			
 			return keys;
-	
 
 		} catch (error: any) {
 			console.log(error)

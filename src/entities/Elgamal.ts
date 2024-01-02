@@ -7,7 +7,7 @@ export interface ElGamalPublicKey {
 
 export interface ElGamalKeys {
     publicKey: ElGamalPublicKey;
-    privateKey: bigint;
+    privateKey: number;
 }
 
 export interface CipherChar {
