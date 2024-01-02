@@ -92,7 +92,6 @@ export default function PrivateChatScreen() {
 		const tempArray: Message[] = [];
 
 		const user = await findUser.execute(location.state.sender._id)
-		console.log("A chave pública do objeto na decriptação é:", user.pub_key)
 
 		if(privateKey && user && user.pub_key) {
 
@@ -100,11 +99,6 @@ export default function PrivateChatScreen() {
 				publicKey: user.pub_key,
 				privateKey: Number(privateKey)
 			};
-
-			console.log('Esse é o usuário na decriptação: ', findUser.execute(location.state.sender._id))
-
-			console.log("O id da pessoa no decryptation é: ", location.state.sender._id)
-			console.log("Se fosse utizado o recipient aqui a chave pub seria: ", location.state.sender.pub_key)
 
 			let senderPos = 0;
 
@@ -119,7 +113,6 @@ export default function PrivateChatScreen() {
 					
 				} 
 				else {
-					console.log("Aqui no arquivo private chat a public key é: ", location.state.sender.pub_key)
 					const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
 					
 					let newMessage: Message = {
@@ -136,12 +129,8 @@ export default function PrivateChatScreen() {
 	};
 
 	const handleMessage = async () => {
-		console.log("O id da pessoa no encryptation é: ", location.state.recipient._id)
-		console.log("Sua chave pública é", location.state.recipient.pub_key)
-		console.log('Esse é o usuário na encriptação: ', findUser.execute(location.state.recipient._id))
 
 		const user = await findUser.execute(location.state.recipient._id)
-		console.log("A chave pública do objeto na encriptação é:", user.pub_key)
 		const pub_key: any = user.pub_key
 
 		if (inputValue.trim() !== '') {
@@ -152,8 +141,6 @@ export default function PrivateChatScreen() {
 
 			setSenderMessages([...senderMessages, newMessage])
 
-			console.log("aqui a pubkey é", pub_key)
-			console.log("")
 			const cipherText = crypto.encryptation(newMessage.text, pub_key)
 			const chatId = String(sessionStorage.getItem("ChatId"))
 			sendMessage.execute(chatId, cipherText, location.state.sender._id)

@@ -76,8 +76,6 @@ export default class ElgamalService {
 		do {
 			randomPrime = this.getRandomPrime(200, 300);
 			primitiveRoot = this.getPrimitiveRoot(randomPrime);
-      		console.log("random prime é: ", randomPrime)
-      		console.log("raiz primitiva é: ", primitiveRoot)
 
 			const randomBytes = new Uint8Array(1); // Adjust the size according to your needs
 			
@@ -98,6 +96,12 @@ export default class ElgamalService {
 			e: String(BigInt(eValue))
 		}
 
+		console.log("O valor de p é: ", pubKey.p)
+		console.log("O valor de g é: ", pubKey.g)
+		console.log("O valor da chave privada é: ", privKey)
+		console.log("O valor de e é: ", pubKey.e)
+		console.log("O valor da chave pública é: ", pubKey)
+
 		return {
 			publicKey: pubKey,
 			privateKey: privKey
@@ -111,7 +115,7 @@ export default class ElgamalService {
 		let cipherChar: CipherChar;
 
 		const unicodeArray = this.getUnicodeValues(plainText);
-    	console.log("Unicode é:", unicodeArray)
+		console.log("O Unicode de ", plainText, " é ", unicodeArray)
 
 		let encrypted = "";
 
@@ -121,24 +125,21 @@ export default class ElgamalService {
 				const randomBytes = new Uint8Array(1); // Adjust the size according to your needs
 	
 				bValue = BigInt(2)
+
+				console.log("O valor de b é: ", bValue)
 		
 				c1 = Number((BigInt(pubkey.g) ** bValue) % BigInt(pubkey.p))
-				console.log("pubkey g é:", pubkey.g)
-				console.log("em c1, publkey p é:", pubkey.p)
-				console.log("c1 é:", c1)
+				console.log("O valor de c1 é: ", c1)
 
 				c2 = Number((BigInt(unicodeArray[i]) * (BigInt(pubkey.e) ** bValue)) % BigInt(pubkey.p))
-				console.log("unicodeArray é", unicodeArray)
-				console.log("pubkey e é:", pubkey.e)
-				console.log("bValue é:", bValue)
-				console.log("pubkey p é:", pubkey.p)
-				console.log("c2 é:", c2)
+				console.log("O valor de c2 é: ", c2)
 				
 				cipherChar = {cipher: c1 + "," + c2}	
 				
 			} while (Number.isNaN(cipherChar.cipher.charAt(0)) || Number.isNaN(cipherChar.cipher.charAt(2)))
 			
 			encrypted = encrypted + cipherChar.cipher + ";";
+			console.log("O valor encriptado é ", encrypted)
 		}
 
 		return encrypted;
@@ -150,26 +151,19 @@ export default class ElgamalService {
 		const decrypted = [];
 		const chipher = cipherText.split(";");
 		chipher.pop()
-
-		console.log("O cipher é: ", cipherText)
 		
 		for (let i = 0; i < chipher.length; i++) {
 			
 			const c1 = Number(chipher[i].split(",")[0]);
-			console.log("O c1 no decrypt é", BigInt(c1))
 			const c2 = Number(chipher[i].split(",")[1]);
 			
-     		console.log("a private key é: ", keys.privateKey)
 			const xValue = (BigInt(c1) ** BigInt(keys.privateKey)) % BigInt(keys.publicKey.p);
-			console.log("A privateKey no decrypt é", keys.privateKey)
-			console.log("o p no decrypt é", keys.publicKey.p)
-      		console.log("x é:", xValue)
+			console.log("O valor de x é: ", xValue)
 			const decryptedChar = Number(BigInt(c2) * (xValue ** (BigInt(keys.publicKey.p) - BigInt(2))) % BigInt(keys.publicKey.p))
-      		console.log("decryptedChar:", decryptedChar)
 			decrypted.push(decryptedChar)
 		}
 
-    	console.log("decrypted é:", decrypted)
+    	console.log("O valor descriptografado é:", decrypted)
 
 		return String.fromCharCode(...decrypted);
   }
