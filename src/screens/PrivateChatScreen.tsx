@@ -8,12 +8,15 @@ import { CreateChat } from '../use_cases/messages/CreateChat';
 import { FindChat } from '../use_cases/messages/FindChat';
 import { ElGamalKeys, ElGamalPublicKey } from '../entities/Elgamal';
 import { SendMessage } from '../use_cases/messages/SendMessage';
+import  UserService  from '../services/UserService'
+import { FindUserById } from '../use_cases/users/FindUser';
 
 
 const crypto = new ElgamalService();
 const createChat = new CreateChat(new ChatService());
 const findChat = new FindChat(new ChatService());
 const sendMessage = new SendMessage(new ChatService());
+const findUser = new FindUserById(new UserService())
 
 
 export default function PrivateChatScreen() {
@@ -73,7 +76,7 @@ export default function PrivateChatScreen() {
 					}
 				})
 	
-			  }, 100000000);
+			  }, 1000);
 		  
 			  return () => clearInterval(interval);
 	
@@ -83,17 +86,25 @@ export default function PrivateChatScreen() {
 	// 	return array.some(obj => obj[attributeName] === attributeValue);
 	// };
 
-	const getMessages = (msg_list: string[][]) => {
+	const getMessages = async (msg_list: string[][]) => {
 
 		const privateKey = sessionStorage.getItem('privateKey');
 		const tempArray: Message[] = [];
 
-		if(privateKey) {
+		const user = await findUser.execute(location.state.sender._id)
+		console.log("A chave pública do objeto na decriptação é:", user.pub_key)
+
+		if(privateKey && user && user.pub_key) {
 
 			const keys: ElGamalKeys = {
-				publicKey: location.state.sender.pub_key,
-				privateKey: BigInt(privateKey)
+				publicKey: user.pub_key,
+				privateKey: Number(privateKey)
 			};
+
+			console.log('Esse é o usuário na decriptação: ', findUser.execute(location.state.sender._id))
+
+			console.log("O id da pessoa no decryptation é: ", location.state.sender._id)
+			console.log("Se fosse utizado o recipient aqui a chave pub seria: ", location.state.sender.pub_key)
 
 			let senderPos = 0;
 
@@ -108,7 +119,7 @@ export default function PrivateChatScreen() {
 					
 				} 
 				else {
-
+					console.log("Aqui no arquivo private chat a public key é: ", location.state.sender.pub_key)
 					const decryptedMsg = crypto.decryptation(msg_list[i][0], keys)
 					
 					let newMessage: Message = {
@@ -124,9 +135,15 @@ export default function PrivateChatScreen() {
 		}
 	};
 
-	const handleMessage = () => {
-		const pub_key: ElGamalPublicKey = location.state.recipient.pub_key;
-		
+	const handleMessage = async () => {
+		console.log("O id da pessoa no encryptation é: ", location.state.recipient._id)
+		console.log("Sua chave pública é", location.state.recipient.pub_key)
+		console.log('Esse é o usuário na encriptação: ', findUser.execute(location.state.recipient._id))
+
+		const user = await findUser.execute(location.state.recipient._id)
+		console.log("A chave pública do objeto na encriptação é:", user.pub_key)
+		const pub_key: any = user.pub_key
+
 		if (inputValue.trim() !== '') {
 			const newMessage: Message = {
 				text: inputValue,
@@ -135,6 +152,8 @@ export default function PrivateChatScreen() {
 
 			setSenderMessages([...senderMessages, newMessage])
 
+			console.log("aqui a pubkey é", pub_key)
+			console.log("")
 			const cipherText = crypto.encryptation(newMessage.text, pub_key)
 			const chatId = String(sessionStorage.getItem("ChatId"))
 			sendMessage.execute(chatId, cipherText, location.state.sender._id)
