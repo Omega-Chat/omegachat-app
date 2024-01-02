@@ -20,7 +20,8 @@ export default class ChatGroupService {
         return responseJSON;
       }
     
-      async addMessageToGroupChat(chatId: string, message: string, sender: string ): Promise<ChatGroup> {
+      async addMessageToGroupChat(chatId: string, message: string, sender: string, receiver: string ): Promise<ChatGroup> {
+        console.log("Group ID: ", chatId)
         // Método para adicionar mensagem a um chat em grupo
         const response = await fetch(`http://localhost:8081/api/chatGroups/${chatId}/messages`, {
           method: 'POST',
@@ -30,7 +31,8 @@ export default class ChatGroupService {
           },
           body: JSON.stringify({
             message: message,
-            sender: sender
+            sender: sender,
+            receiver: receiver
           })
         });
         const responseJSON = await response.json();

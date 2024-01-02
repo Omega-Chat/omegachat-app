@@ -82,8 +82,7 @@ export default class UserService {
     }
 
     async findUserById(userId: string): Promise<User> {
-        console.log(userId)
-        const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
+        const response = await fetch(`http://localhost:8081/api/users/${userId}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
