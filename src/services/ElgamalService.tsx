@@ -111,7 +111,7 @@ export default class ElgamalService {
 		let cipherChar: CipherChar;
 
 		const unicodeArray = this.getUnicodeValues(plainText);
-    	// console.log("Unicode é:", unicodeArray)
+    	console.log("Unicode é:", unicodeArray)
 
 		let encrypted = "";
 
@@ -123,16 +123,16 @@ export default class ElgamalService {
 				bValue = BigInt(2)
 		
 				c1 = Number((BigInt(pubkey.g) ** bValue) % BigInt(pubkey.p))
-				// console.log("pubkey g é:", pubkey.g)
-				// console.log("em c1, publkey p é:", pubkey.p)
-				// console.log("c1 é:", c1)
+				console.log("pubkey g é:", pubkey.g)
+				console.log("em c1, publkey p é:", pubkey.p)
+				console.log("c1 é:", c1)
 
 				c2 = Number((BigInt(unicodeArray[i]) * (BigInt(pubkey.e) ** bValue)) % BigInt(pubkey.p))
-				// console.log("unicodeArray é", unicodeArray)
-				// console.log("pubkey e é:", pubkey.e)
-				// console.log("bValue é:", bValue)
-				// console.log("pubkey p é:", pubkey.p)
-				// console.log("c2 é:", c2)
+				console.log("unicodeArray é", unicodeArray)
+				console.log("pubkey e é:", pubkey.e)
+				console.log("bValue é:", bValue)
+				console.log("pubkey p é:", pubkey.p)
+				console.log("c2 é:", c2)
 				
 				cipherChar = {cipher: c1 + "," + c2}	
 				
