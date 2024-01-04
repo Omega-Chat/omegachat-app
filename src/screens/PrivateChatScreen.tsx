@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane } from 'react-icons/fa';
-import { useLocation } from 'react-router';
+import { FaPaperPlane, FaTimes } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router';
 import { Message } from '../entities/Chat';
 import ElgamalService from '../services/ElgamalService';
 import ChatService from '../services/ChatService';
@@ -22,7 +22,7 @@ const findUser = new FindUserById(new UserService())
 export default function PrivateChatScreen() {
 
 	const location = useLocation();
-
+	const navigate = useNavigate();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [senderMessages, setSenderMessages] = useState<Message[]>([]);
 
@@ -61,6 +61,11 @@ export default function PrivateChatScreen() {
 		sessionStorage.setItem('senderMessages', JSON.stringify(messagesToSave));
 	};
 
+	const closeChat = () => {
+		navigate('/chat', {
+				state: { sender: location.state.sender,},
+			})
+	};
 
 	useEffect(() => {
 			const interval = setInterval(() => {
@@ -249,10 +254,20 @@ export default function PrivateChatScreen() {
 		color:'#5034C4',
 	};
 
+	const closeButtonStyle: React.CSSProperties = {
+		position: 'absolute',
+		top: '10px',
+		right: '10px',
+		cursor: 'pointer',
+		fontSize: '24px',
+		color: '#8a2be2',
+	};
+
 	return (
 		<div style={chatContainerStyle}>
 		<div style={topBarStyle} ref={topBarRef}>
 			<div style={recipientNameStyle}>{location.state.recipient.name}</div>
+			<FaTimes style={closeButtonStyle} onClick={closeChat} />
 			<hr style={{ width: '100%' }} />
 		</div>
 
