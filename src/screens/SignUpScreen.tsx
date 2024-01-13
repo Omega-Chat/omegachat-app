@@ -1,15 +1,16 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { primary } from "../theme/colors";
 import UserService from "../services/UserService";
-import Login from "../use_cases/users/Login";
 import { useEffect, useState } from "react";
+import CreateUser from "../use_cases/users/CreateUser";
 
-const loginUser = new Login(new UserService());
+const createUser = new CreateUser(new UserService());
 
-export default function LoginScreen() {
+export default function SignUpScreen() {
 
 	const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
 
 	const navigate = useNavigate();
 
@@ -22,9 +23,9 @@ export default function LoginScreen() {
 	async function SendData() {
 
         try {
-                const loggeduser = await loginUser.execute(email, password);
+                const createdUser = await createUser.execute(name, email, password);
 
-                navigate("/chat", {state: {sender: loggeduser}});
+                navigate("/login",);
 
         } catch (error: any) {
             console.log(error)
@@ -50,6 +51,35 @@ export default function LoginScreen() {
 					fontSize: 35,
 					fontWeight: "bold",
 					color: primary}}>OmegaChat</h1>
+            
+            <div 
+				style={{
+					marginRight: "5%",
+					marginLeft: "5%",
+				}}>
+				<h4 
+					style={{
+					textAlign: "left",
+					marginTop: 0,
+					marginBottom: 0,
+					color: primary}}>Name</h4>
+				<input 
+					style={{
+						width: 352,
+						height: 40,
+						marginTop: 5,
+						marginBottom: 10,
+						backgroundColor: "white",
+						borderWidth: 2,
+						borderRadius: 5,
+						borderColor: primary
+					}}
+					type="text"
+					onChange={e => {
+						setName(e.target.value);
+					}}/>
+
+			</div>
 
 			<div 
 				style={{
@@ -119,16 +149,17 @@ export default function LoginScreen() {
 					fontSize: 15
 
 				}}
-				onClick={SendData}>Log In</button>
+				onClick={SendData}>Sign Up</button>
 
-			<div style={{ marginTop: "2%", textAlign: "center" }}>
+            <div style={{ marginTop: "2%", textAlign: "center" }}>
 					<p
 					style={{ color: primary, textDecoration: "underline", cursor: "pointer" }}
-					onClick={() => navigate("/")}
+					onClick={() => navigate("/login")}
 					>
-					Voltar para tela de cadastro
+					Ir para tela de login
 					</p>
 				</div>
+                
 
 		</div>
 			

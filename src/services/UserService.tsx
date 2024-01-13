@@ -3,6 +3,37 @@ import { User } from "../entities/User";
 
 export default class UserService {
 
+    async createUser(name: string, email: string, password: string): Promise<User> {
+        try {
+          const response = await fetch(`http://localhost:8081/api/users`, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                password: password,
+                online: false
+            
+            })
+          });
+      
+          const responseJSON = await response.json();
+          const responseStatus = response.status;
+      
+          if (responseStatus !== 201) {
+            throw new Error(responseJSON.message || 'Error creating a new user');
+          }
+      
+          return responseJSON;
+        } catch (error) {
+          throw new Error('Error creating a new user');
+        }
+      }
+      
+
     async login(email: string, password: string): Promise<User> {
         const response = await fetch(`http://localhost:8081/api/loginUser`, {
             method: 'POST',

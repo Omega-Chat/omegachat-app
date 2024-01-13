@@ -3,6 +3,7 @@ import LoginScreen from './screens/LoginScreen'
 import HomeChatScreen from './screens/HomeChatScreen'
 import PrivateChatScreen from './screens/PrivateChatScreen'
 import GroupChatScreen from './screens/GroupChatScreen'
+import SignUpScreen from './screens/SignUpScreen'
 // import PrivateChatScreen from './screens/PrivateChatScreen'
 // import GroupChatScreen from './screens/GroupChatScreen'
 
@@ -16,6 +17,10 @@ import GroupChatScreen from './screens/GroupChatScreen'
 export const router = createBrowserRouter([
     {
         path: '/',
+        element: <SignUpScreen/>
+    }, 
+    {
+        path: '/login',
         element: <LoginScreen/>
     },
     {

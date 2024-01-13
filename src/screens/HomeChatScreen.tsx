@@ -112,7 +112,7 @@ export default function HomeChatScreen() {
 			const exitedUser = await exitchat.execute(location.state.sender._id);
 			console.log(exitedUser)
 
-			navigate("/");
+			navigate("/login");
 
 		} catch (error: any) {
 			console.log(error)
