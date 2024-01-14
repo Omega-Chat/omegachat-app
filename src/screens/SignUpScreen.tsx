@@ -150,7 +150,7 @@ export default function SignUpScreen() {
       <div style={{ marginTop: "2%", textAlign: "center" }}>
         <p
           style={{ color: primary, textDecoration: "underline", cursor: "pointer" }}
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/")}
         >
           Ir para tela de login
         </p>

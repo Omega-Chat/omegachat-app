@@ -23,6 +23,11 @@ export default function LoginScreen() {
 
         try {
                 const loggeduser = await loginUser.execute(email, password);
+				
+				if(loggeduser?._id !== undefined){
+					console.log(loggeduser._id)
+					sessionStorage.setItem('loggeduser', loggeduser._id);
+				}
 
                 navigate("/chat", {state: {sender: loggeduser}});
 
@@ -124,7 +129,7 @@ export default function LoginScreen() {
 			<div style={{ marginTop: "2%", textAlign: "center" }}>
 					<p
 					style={{ color: primary, textDecoration: "underline", cursor: "pointer" }}
-					onClick={() => navigate("/")}
+					onClick={() => navigate("/signup")}
 					>
 					Voltar para tela de cadastro
 					</p>

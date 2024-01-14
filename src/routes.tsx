@@ -17,11 +17,11 @@ import SignUpScreen from './screens/SignUpScreen'
 export const router = createBrowserRouter([
     {
         path: '/',
-        element: <SignUpScreen/>
+        element: <LoginScreen/>
     }, 
     {
-        path: '/login',
-        element: <LoginScreen/>
+        path: '/signup',
+        element: <SignUpScreen/>
     },
     {
         path: '/chat',
