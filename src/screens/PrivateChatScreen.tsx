@@ -80,6 +80,18 @@ export default function PrivateChatScreen() {
 						getMessages(chat.msg_list)
 					}
 				})
+
+				findUser.execute(location.state.recipient._id).then((recipient) => {
+					if(recipient) {
+						if(!recipient.online) {
+							window.alert(`O usuário ${recipient.name} foi desconectado`);
+							closeChat()
+
+						}
+					}
+				})
+
+
 	
 			  }, 1000);
 		  
