@@ -284,13 +284,9 @@ export default function PrivateChatScreen() {
 		</div>
 
 		{messages.map((message, index) => (
-			<div
-			key={index}
-			style={
-				message.isUser ? { ...messageStyle, ...userMessageStyle } : { ...messageStyle, ...otherMessageStyle }
-			}
-			>
-			{message.text}
+			<div key={index}
+				style={message.isUser ? { ...messageStyle, ...userMessageStyle } : { ...messageStyle, ...otherMessageStyle }}>
+				{message.text}
 			</div>
 		))}
 		<div ref={chatEndRef} />

@@ -111,18 +111,21 @@ export default function GroupChatScreen() {
 						};
 
 						console.log("A chave na descripto é ", user.pub_key)
-					
-						if (msg_list[i][2] === location.state.sender._id ){
+
+						// Se a mensagem for do usuário remetente
+						if (msg_list[i][2] === location.state.sender._id && i % 5 === 0){
 				
 							tempArray.push(senderMessages[senderPos])
 							
 							senderPos = senderPos + 1;
 							
 						} 
+						// Se for do usuario destinatario
 						else {
-							if(msg_list[i][2] === location.state.sender._id){
-								continue
-							} else {
+
+							if(msg_list[i][2] === location.state.sender._id) continue;
+							else {
+
 								if(msg_list[i][1] === location.state.sender._id){
 
 									const user = await findUser.execute(msg_list[i][2]);
@@ -201,6 +204,14 @@ export default function GroupChatScreen() {
 		margin: '0',
 	};
 
+	const messageStyle: React.CSSProperties = {
+		margin: '5px 0',
+		padding: '10px',
+		borderRadius: '8px',
+		maxWidth: '70%',
+		wordWrap: 'break-word',
+	};
+
 	const userMessageStyle: React.CSSProperties = {
 		alignSelf: 'flex-end',
 		backgroundColor: '#8a2be2',
@@ -213,7 +224,7 @@ export default function GroupChatScreen() {
 	};
 
 	const otherMessageStyle: React.CSSProperties = {
-		alignSelf: 'flex-start',
+		alignSelf: 'center',
 		backgroundColor: '#C59DF7',
 		color: 'black',
 		borderRadius: '15px',
@@ -299,19 +310,28 @@ export default function GroupChatScreen() {
 			<hr style={{ width: '100%', color: 'black' }} />
 		</div>
 		{messages.map((message, index) => (
-		<div key={index}>
-			{message && ('isUser' in message) && (
-			<div style={message.isUser ? userMessageStyle : otherMessageStyle}>
-				{!message.isUser && <div style={senderNameStyle}>{message.senderName}</div>}
-				<div>
-				<span style={{ fontSize: '14px', fontFamily: 'Rubick', color: 'black' }}>
-					{message.text}
-				</span>
-				</div>
-			</div>
-			)}
-		</div>
+			
+			<>
+				{message.isUser ? (
+					<div 
+						key={index}
+						style={userMessageStyle}>
+							{message.text}
+					</div>
+					
+				):(
+					<div
+						key={index} 
+						style={otherMessageStyle}>
+							<div style={senderNameStyle}>{message.senderName}</div>
+							<span style={{ fontSize: '14px', fontFamily: 'Rubick', color: 'black' }}>
+									{message.text}
+							</span>
+					</div>
+				)}
+			</>
 		))}
+
 		<div ref={chatEndRef} />
 
 		{/* Input para enviar mensagem */}
