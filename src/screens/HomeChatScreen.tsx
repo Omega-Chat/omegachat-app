@@ -16,6 +16,8 @@ import ChatService from "../services/ChatService";
 import { EnterChat } from "../use_cases/users/EnterChat";
 import ChatGroupService from "../services/ChatGroupService";
 import { CreateChatGroup } from "../use_cases/messages/CreateChatGroup";
+import { FindChat } from "../use_cases/messages/FindChat";
+import { isStringObject } from "util/types";
 
 
 const crypto = new ElgamalService();
@@ -25,6 +27,7 @@ const exitchat = new ExitChat(new UserService())
 const enterChat = new EnterChat(new UserService())
 const deleteChat = new DeletePrivateChat(new ChatService())
 const createGroupChat = new CreateChatGroup(new ChatGroupService())
+const findChat = new FindChat(new ChatService());
 
 
 export default function HomeChatScreen() {
@@ -34,24 +37,55 @@ export default function HomeChatScreen() {
 
 	const [onlineUserList, setOnlineUserList] = useState<User[]>();
 	const [allOnlineUsers, setAllOnlineUsers] = useState<User[]>([]);
+	const [notifications, setNotification] = useState<number[]>()
+	
 
 	useEffect(() => {
-		fetchall.execute().then((data) => {
-			setAllOnlineUsers(data);
-			let filteredUsers = RemoveUserByName(data, location.state.sender.name);
-			setOnlineUserList(filteredUsers);
-		})
+		const interval = setInterval(() => {
+			fetchall.execute().then((data) => {
+				setAllOnlineUsers(data);
+				let filteredUsers = RemoveUserByName(data, location.state.sender.name);
+				setOnlineUserList(filteredUsers);
+			})
+	
+			const chatId = sessionStorage.getItem('ChatId');
+			if(chatId) {
+				deleteChat.execute(chatId);
+				sessionStorage.removeItem('ChatId');
+			}
+	
+			enterChat.execute(location.state.sender._id);
+	
+			getNotifications();
 
-		const chatId = sessionStorage.getItem('ChatId');
-		if(chatId) {
-			deleteChat.execute(chatId);
-			sessionStorage.removeItem('ChatId');
+		  }, 2000);
+	  
+		  return () => clearInterval(interval);
+
+
+	});
+
+	async function getNotifications() {
+
+		if(onlineUserList){
+			const users: User[] = onlineUserList;
+			const tempArray: number[] = [];
+
+			for(let i = 0; i < users.length; i++) {
+
+					let user_id = String(users[i]._id);
+					console.log(location.state.sender, user_id)
+					const chat = await findChat.execute(location.state.sender._id, user_id)
+					if(chat){
+						tempArray.push(chat.msg_list.length)
+					} else {
+						tempArray.push(0)
+					}
+			}
+			setNotification(tempArray)
 		}
 
-		enterChat.execute(location.state.sender._id);
-
-
-	}, []);
+	}
 
 	function executeOnce() {
 
@@ -159,6 +193,7 @@ export default function HomeChatScreen() {
 				<UserChatCard
 				  key={index}
 				  data={user}
+				  notification={notifications !== undefined ? notifications[index]: 0}
 				  onChatStart={() =>
 					navigate('/private', {
 					  state: { sender: location.state.sender, recipient: user},

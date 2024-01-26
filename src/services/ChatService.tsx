@@ -29,6 +29,17 @@ export default class ChatService {
           return responseJSON;
     }
 
+    async fetchAll(): Promise<Chat[]> {
+        const response = await fetch(
+          `http://localhost:8081/api/chats`
+        );
+    
+        const responseJSON = await response.json();
+        const responseStatus = response.status;
+        if (responseStatus !== 200) throw new Error(responseJSON.message);
+        return responseJSON;
+    }
+
     async sendMessage(chatId: string | undefined, message: string, sender: string): Promise<Chat | null> {
         console.log(chatId, message, sender)
         const response = await fetch(`http://localhost:8081/api/chats/${chatId}/messages`, {

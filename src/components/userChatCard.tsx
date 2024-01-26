@@ -1,27 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { User } from '../entities/User';
 import { useNavigate } from 'react-router-dom';
 import { primary, userCardBackground } from '../theme/colors';
 
-
 interface Props {
     data: User;
+    notification: number;
     onChatStart: () => void;
 }
 
 
-
-const UserChatCard: React.FC<Props> = ({data, onChatStart}) => {
+const UserChatCard: React.FC<Props> = ({data, notification, onChatStart}) => {
     
     const navigate = useNavigate();
-
-    // const handleAdquireClick = () => {
-    //     if (data.ipfsHash) {
-    //         const ipfsLink = `${data.ipfsHash}`; // Construct the IPFS link
-    //         window.open(ipfsLink, '_blank'); // Open the link in a new tab or window
-    //     }
-    // };
-
 
     return (
         <div className='container'>
@@ -35,7 +26,8 @@ const UserChatCard: React.FC<Props> = ({data, onChatStart}) => {
                                 marginLeft: 10,
                                 flex: 4
                             }}>{data.name}</h4>
-                        <button
+                        {notification === 0 || notification === undefined ? (
+                            <button
                             style={{
                                 backgroundColor: primary,
                                 color: "white",
@@ -48,6 +40,23 @@ const UserChatCard: React.FC<Props> = ({data, onChatStart}) => {
 
                             }}
                             onClick={() => onChatStart()}>Start Chat</button>
+                        ):(
+                            <button
+                            style={{
+                                backgroundColor: "red",
+                                color: "white",
+                                borderRadius: 5,
+                                borderColor: "red",
+                                fontSize: 15,
+                                height: 30,
+                                alignSelf: "center",
+                                flex: 2,
+                                marginRight: 10
+
+                            }}
+                            onClick={() => onChatStart()}>View Message: {notification}</button>
+                            
+                         )}
                     </>
                     }
                         
