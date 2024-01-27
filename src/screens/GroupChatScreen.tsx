@@ -312,20 +312,20 @@ export default function GroupChatScreen() {
 		{messages.map((message, index) => (
 			
 			<>
-				{message.isUser ? (
+				{ message?.isUser ? (
 					<div 
 						key={index}
 						style={userMessageStyle}>
-							{message.text}
+							{message?.text}
 					</div>
 					
 				):(
 					<div
 						key={index} 
 						style={otherMessageStyle}>
-							<div style={senderNameStyle}>{message.senderName}</div>
+							<div style={senderNameStyle}>{message?.senderName}</div>
 							<span style={{ fontSize: '14px', fontFamily: 'Rubick', color: 'black' }}>
-									{message.text}
+									{message?.text}
 							</span>
 					</div>
 				)}
