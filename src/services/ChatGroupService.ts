@@ -58,4 +58,20 @@ export default class ChatGroupService {
         return responseJSON;
       }
 
+      async removeUser(groupId: string, userId: string): Promise<boolean> {
+        const response = await fetch(`http://localhost:8081/api/chatGroups/${groupId}/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        const responseStatus = response.status;
+        if (responseStatus !== 200) {
+            const responseJSON = await response.json();
+            throw new Error(responseJSON.message);
+        }
+        return true;
+    }
+
 }

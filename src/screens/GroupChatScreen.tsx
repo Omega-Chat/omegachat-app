@@ -46,9 +46,11 @@ export default function GroupChatScreen() {
 
 
 	const closeChat = () => {
+		numberUsers.execute()
+		removeUserGroupChat.execute()
 		navigate('/chat', {
 				state: { sender: location.state.sender,},
-			})
+		})
 	};
 
 

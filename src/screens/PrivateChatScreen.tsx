@@ -62,6 +62,7 @@ export default function PrivateChatScreen() {
 	};
 
 	const closeChat = () => {
+		
 		navigate('/chat', {
 				state: { sender: location.state.sender,},
 			})
