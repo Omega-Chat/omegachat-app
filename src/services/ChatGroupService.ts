@@ -58,6 +58,29 @@ export default class ChatGroupService {
         return responseJSON;
       }
 
+      async getUsersInGroupChat(chatId: string): Promise<string[] | null> {
+        try {
+            // Método para obter os usuários de um chat em grupo
+            const response = await fetch(`http://localhost:8081/api/chatGroups/${chatId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const responseJSON = await response.json();
+            const responseStatus = response.status;
+
+            if (responseStatus !== 200) throw new Error(responseJSON.message);
+
+            return responseJSON;
+        } catch (error) {
+            console.error('Error getting users in group chat:', error);
+            return null;
+        }
+    }
+
       async removeUser(groupId: string, userId: string): Promise<boolean> {
         const response = await fetch(`http://localhost:8081/api/chatGroups/${groupId}/${userId}`, {
             method: 'DELETE',
@@ -73,5 +96,22 @@ export default class ChatGroupService {
         }
         return true;
     }
+
+    async  deleteChatGroup(groupId: string): Promise<boolean> {
+      const response = await fetch(`http://localhost:8081/api/chatGroups/${groupId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        const responseStatus = response.status;
+        if (responseStatus !== 200) {
+            const responseJSON = await response.json();
+            throw new Error(responseJSON.message);
+        }
+        return true;
+  }
+  
 
 }

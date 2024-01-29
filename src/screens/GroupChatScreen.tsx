@@ -10,11 +10,17 @@ import { FindUserById } from '../use_cases/users/FindUser';
 import  UserService  from '../services/UserService'
 import ElgamalService from '../services/ElgamalService';
 import { ElGamalKeys } from '../entities/Elgamal';
+import { GetUsersGroupChat } from '../use_cases/messages/GetUsersGroupChat';
+import { RemoveUserGroupChat } from '../use_cases/messages/RemoveUserGroupChat';
+import { DeleteChatGroup } from '../use_cases/messages/DeleteChatGroup';
 
 const createGroupChat = new CreateChatGroup(new ChatGroupService())
 const sendMessage = new AddMessageToGroupChat(new ChatGroupService())
 const getGroupMessages = new GetGroupChatMessages(new ChatGroupService())
 const findUser = new FindUserById(new UserService())
+const getUsers = new GetUsersGroupChat(new ChatGroupService())
+const removeUser = new RemoveUserGroupChat(new ChatGroupService())
+const deleteChat = new DeleteChatGroup(new ChatGroupService())
 const crypto = new ElgamalService();
 
 export default function GroupChatScreen() {
@@ -45,7 +51,16 @@ export default function GroupChatScreen() {
 	executeOnce()
 
 
-	const closeChat = () => {
+	const closeChat = async () => {
+		const chatId = String(sessionStorage.getItem("GroupChatId"))
+		const users = await getUsers.execute(chatId)
+
+		if (users && users.length > 1){
+			removeUser.execute(chatId,location.state.sender._id )
+		} else{
+			deleteChat.execute(chatId)
+		}
+
 		navigate('/chat', {
 				state: { sender: location.state.sender,},
 		})
@@ -113,7 +128,7 @@ export default function GroupChatScreen() {
 						console.log("A chave na descripto é ", user.pub_key)
 
 						// Se a mensagem for do usuário remetente
-						if (msg_list[i][2] === location.state.sender._id && i % 5 === 0){
+						 if (msg_list[i][2] === location.state.sender._id && i % 5 === 0){
 				
 							tempArray.push(senderMessages[senderPos])
 							
@@ -121,7 +136,7 @@ export default function GroupChatScreen() {
 							
 						} 
 						// Se for do usuario destinatario
-						else {
+						else { 
 
 							if(msg_list[i][2] === location.state.sender._id) continue;
 							else {
