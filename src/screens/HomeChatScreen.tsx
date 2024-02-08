@@ -18,7 +18,7 @@ import ChatGroupService from "../services/ChatGroupService";
 import { CreateChatGroup } from "../use_cases/messages/CreateChatGroup";
 import { FindChat } from "../use_cases/messages/FindChat";
 import { isStringObject } from "util/types";
-
+import Popup from './PopUpScreen';
 
 const crypto = new ElgamalService();
 const fetchall = new FetchAll(new UserService())
@@ -38,6 +38,7 @@ export default function HomeChatScreen() {
 	const [onlineUserList, setOnlineUserList] = useState<User[]>();
 	const [allOnlineUsers, setAllOnlineUsers] = useState<User[]>([]);
 	const [notifications, setNotification] = useState<number[]>()
+	const [isPopupOpen, setIsPopupOpen] = useState(false);
 	
 
 	useEffect(() => {
@@ -64,6 +65,10 @@ export default function HomeChatScreen() {
 
 
 	});
+
+	const openPopup = () => {
+		setIsPopupOpen(true);
+	  };
 
 	async function getNotifications() {
 
@@ -110,7 +115,7 @@ export default function HomeChatScreen() {
 
 
 
-	function RemoveUserByName(usersArray: User[], userName: string) {
+	 function RemoveUserByName(usersArray: User[], userName: string) {
 		// Find the index of the user with the specified name
 		const indexToRemove = usersArray.findIndex(user => user.name === userName);
 	
@@ -213,7 +218,7 @@ export default function HomeChatScreen() {
 				margin: '270px auto 0px auto', // Updated margin for positioning
 				marginLeft: 260,
 			  }}
-			  onClick={ToGroup}
+			  onClick={openPopup}
 			/>
 			<p
 			  style={{
@@ -243,6 +248,8 @@ export default function HomeChatScreen() {
 			  Leave Chat
 			</button>
 		  </div>
+
+		  <Popup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
 		</div>
 	  );
 	}
