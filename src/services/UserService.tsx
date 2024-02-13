@@ -1,11 +1,12 @@
 import { ElGamalPublicKey } from "../entities/Elgamal";
 import { User } from "../entities/User";
+import { API_URL } from "../constants";
 
 export default class UserService {
 
     async createUser(name: string, email: string, password: string): Promise<User> {
         try {
-          const response = await fetch(`http://localhost:8081/api/users`, {
+          const response = await fetch(`${API_URL}/users`, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -34,16 +35,15 @@ export default class UserService {
       }
       
 
-    async login(email: string, password: string): Promise<User> {
-        const response = await fetch(`http://localhost:8081/api/loginUser`, {
+    async login(email: string): Promise<User> {
+        const response = await fetch(`${API_URL}/loginUser`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                email: email,
-                password: password,
+                email: email
             })
         })
         const responseJSON = await response.json();
@@ -55,7 +55,7 @@ export default class UserService {
 
     async fetchAll(): Promise<User[]> {
         const response = await fetch(
-          `http://localhost:8081/api/users`
+          `${API_URL}/users`
         );
     
         const responseJSON = await response.json();
@@ -66,7 +66,7 @@ export default class UserService {
 
     async updatePubKey(user_id: string, pub_key: ElGamalPublicKey|undefined): Promise<User> {
         
-        const response = await fetch(`http://localhost:8081/api/users/${user_id}/pub_key`, {
+        const response = await fetch(`${API_URL}/users/${user_id}/pub_key`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -82,7 +82,7 @@ export default class UserService {
     
     async exitChat(user_id: string, newState: boolean| undefined): Promise<User> {
 
-        const response = await fetch(`http://localhost:8081/api/users/${user_id}`, {
+        const response = await fetch(`${API_URL}/users/${user_id}`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -98,7 +98,7 @@ export default class UserService {
 
     async enterChat(user_id: string, newState: boolean| undefined): Promise<User> {
 
-        const response = await fetch(`http://localhost:8081/api/users/${user_id}`, {
+        const response = await fetch(`${API_URL}/users/${user_id}`, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -113,7 +113,7 @@ export default class UserService {
     }
 
     async findUserById(userId: string): Promise<User> {
-        const response = await fetch(`http://localhost:8081/api/users/${userId}`, {
+        const response = await fetch(`${API_URL}/users/${userId}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

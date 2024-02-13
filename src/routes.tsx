@@ -4,15 +4,7 @@ import HomeChatScreen from './screens/HomeChatScreen'
 import PrivateChatScreen from './screens/PrivateChatScreen'
 import GroupChatScreen from './screens/GroupChatScreen'
 import SignUpScreen from './screens/SignUpScreen'
-// import PrivateChatScreen from './screens/PrivateChatScreen'
-// import GroupChatScreen from './screens/GroupChatScreen'
-
-//const messages = [
-  //  { text: 'Olá! Como vai?', isUser: true },
-    //{ text: 'Tudo bem, e você?', isUser: false },
-    //{ text: 'Estou ótimo, obrigado! Gostaria de saber que horas vc sai para que possamos marcar algo para se encontrar', isUser: true },
-  
-  //];
+import ForgotPassScreen from './screens/ForgotPassScreen'
 
 export const router = createBrowserRouter([
     {
@@ -34,5 +26,9 @@ export const router = createBrowserRouter([
      {
          path: '/group',
          element: <GroupChatScreen/>
-     }
+     },
+     {
+        path: '/forgot',
+        element: <ForgotPassScreen/>
+    }
   ])

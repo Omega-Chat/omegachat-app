@@ -1,10 +1,11 @@
 import { ChatGroup } from "../entities/ChatGroup";
+import { API_URL } from "../constants";
 
 export default class ChatGroupService {
 
     async createGroupChat(userIds: string[]): Promise<ChatGroup> {
         // Método para criar um chat em grupo
-        const response = await fetch(`http://localhost:8081/api/chatGroups`, {
+        const response = await fetch(`${API_URL}/chatGroups`, {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -23,7 +24,7 @@ export default class ChatGroupService {
       async addMessageToGroupChat(chatId: string, message: string, sender: string, receiver: string ): Promise<ChatGroup> {
         console.log("Group ID: ", chatId)
         // Método para adicionar mensagem a um chat em grupo
-        const response = await fetch(`http://localhost:8081/api/chatGroups/${chatId}/messages`, {
+        const response = await fetch(`${API_URL}/chatGroups/${chatId}/messages`, {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -43,7 +44,7 @@ export default class ChatGroupService {
     
       async getMessagesFromGroupChat(chatId: string): Promise<string[][] | null> {
         // Método para obter mensagens de um chat em grupo
-        const response = await fetch(`http://localhost:8081/api/chatGroups/${chatId}/messages`, {
+        const response = await fetch(`${API_URL}/chatGroups/${chatId}/messages`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -61,7 +62,7 @@ export default class ChatGroupService {
       async getUsersInGroupChat(chatId: string): Promise<string[] | null> {
         try {
             // Método para obter os usuários de um chat em grupo
-            const response = await fetch(`http://localhost:8081/api/chatGroups/${chatId}`, {
+            const response = await fetch(`${API_URL}/chatGroups/${chatId}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -82,7 +83,7 @@ export default class ChatGroupService {
     }
 
       async removeUser(groupId: string, userId: string): Promise<boolean> {
-        const response = await fetch(`http://localhost:8081/api/chatGroups/${groupId}/${userId}`, {
+        const response = await fetch(`${API_URL}/chatGroups/${groupId}/${userId}`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -98,7 +99,7 @@ export default class ChatGroupService {
     }
 
     async  deleteChatGroup(groupId: string): Promise<boolean> {
-      const response = await fetch(`http://localhost:8081/api/chatGroups/${groupId}`, {
+      const response = await fetch(`${API_URL}/chatGroups/${groupId}`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',

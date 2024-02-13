@@ -4,49 +4,32 @@ import UserService from "../services/UserService";
 import Login from "../use_cases/users/Login";
 import { useEffect, useState } from "react";
 import bcrypt from 'bcryptjs';
+import axios from 'axios';
 
 
 
 const loginUser = new Login(new UserService());
 
-export default function LoginScreen() {
+export default function ForgotPassScreen() {
 
 	const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
 
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		sessionStorage.removeItem('privateKey');
-		sessionStorage.removeItem('hasExecuted');
 
-	}, []);
-	
 
-	async function SendData() {
+	async function Reset() {
 
         try {
-                const loggeduser = await loginUser.execute(email, password);
-				
-				if(loggeduser){
-					bcrypt.compare(password, loggeduser?.password, function(err, isMatch){
-						if(err){
-							throw err;
-						} else if(!isMatch) {
-							console.log('Password dosen`t match!')
-						} else {
-							if(loggeduser?._id !== undefined){
-								console.log(loggeduser._id)
-								sessionStorage.setItem('loggeduser', loggeduser._id);
-							}
-							navigate("/chat", {state: {sender: loggeduser}});
-						}
-					})
-				}
-				
-				
-
-                
+            axios.post('forgot', email).then(
+                res => {
+                    console.log(res)
+                }
+            ).catch(
+                err => {
+                    console.log(err);
+                }
+            )
 
         } catch (error: any) {
             console.log(error)
@@ -72,15 +55,15 @@ export default function LoginScreen() {
 					fontSize: 35,
 					fontWeight: "bold",
 					color: primary}}>OmegaChat</h1>
-			
-			<h3
+
+            <h3
 				style={{
 					textAlign: "left",
 					marginLeft: 25,
 					font: "icon",
 					fontSize: 20,
 					fontWeight: "bold",
-					color: primary}}>Login</h3>
+					color: primary}}>Mudar senha</h3>
 
 			<div 
 				style={{
@@ -110,38 +93,11 @@ export default function LoginScreen() {
 					}}/>
 
 			</div>
-			<div 
-				style={{
-					marginRight: "5%",
-					marginLeft: "5%",
-				}}>
-				<h4 
-					style={{
-					textAlign: "left",
-					marginTop: 0,
-					marginBottom: 0,
-					color: primary}}>Password</h4>
-				<input 
-					style={{
-						width: 352,
-						height: 40,
-						marginTop: 5,
-						backgroundColor: "white",
-						borderWidth: 2,
-						borderRadius: 5,
-						borderColor: primary
-					}}
-					type="text"
-					onChange={e => {
-						setPassword(e.target.value);
-					}}/>
-
-			</div>
 			<button
 				style={{
 					marginRight: "5%",
 					marginLeft: "6%",
-					marginTop: "30%",
+					marginTop: "10%",
 					height: 50,
 					width: 352,
 					backgroundColor: primary,
@@ -150,25 +106,16 @@ export default function LoginScreen() {
 					fontSize: 15
 
 				}}
-				onClick={SendData}>Log In</button>
+				onClick={Reset}>Submeter</button>
 
 			<div style={{ marginTop: "2%", textAlign: "center" }}>
 					<p
 					style={{ color: primary, textDecoration: "underline", cursor: "pointer" }}
-					onClick={() => navigate("/signup")}
+					onClick={() => navigate("/")}
 					>
-					Voltar para tela de cadastro
+					Voltar para tela de login
 					</p>
-			</div>
-
-			<div style={{ marginTop: "2%", textAlign: "center" }}>
-					<p
-					style={{ color: primary, textDecoration: "underline", cursor: "pointer" }}
-					onClick={() => navigate("/forgot")}
-					>
-					Esqueci minha senha
-					</p>
-			</div>
+				</div>
 
 		</div>
 			

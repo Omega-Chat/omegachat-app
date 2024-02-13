@@ -1,10 +1,10 @@
 import { Chat } from "../entities/Chat";
-
+import { API_URL } from "../constants";
 
 export default class ChatService {
 
     async create(id_usuario1: string, id_usuario2: string): Promise<Chat | null> {
-        const response = await fetch(`http://localhost:8081/api/chats`, {
+        const response = await fetch(`${API_URL}/chats`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -22,7 +22,7 @@ export default class ChatService {
     }
 
     async findByUsers(id_usuario1: string, id_usuario2: string): Promise<Chat | null> {
-        const response = await fetch(`http://localhost:8081/api/chats/${id_usuario1}/${id_usuario2}`);
+        const response = await fetch(`${API_URL}/chats/${id_usuario1}/${id_usuario2}`);
           const responseJSON = await response.json();
           const responseStatus = response.status;
           if (responseStatus !== 200) throw new Error(responseJSON.message);
@@ -31,7 +31,7 @@ export default class ChatService {
 
     async fetchAll(): Promise<Chat[]> {
         const response = await fetch(
-          `http://localhost:8081/api/chats`
+          `${API_URL}/chats`
         );
     
         const responseJSON = await response.json();
@@ -42,7 +42,7 @@ export default class ChatService {
 
     async sendMessage(chatId: string | undefined, message: string, sender: string): Promise<Chat | null> {
         console.log(chatId, message, sender)
-        const response = await fetch(`http://localhost:8081/api/chats/${chatId}/messages`, {
+        const response = await fetch(`${API_URL}/chats/${chatId}/messages`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -60,7 +60,7 @@ export default class ChatService {
     }
 
     async deletePrivateChat(chatId: string): Promise<boolean> {
-        const response = await fetch(`http://localhost:8081/api/chats/${chatId}`, {
+        const response = await fetch(`${API_URL}/chats/${chatId}`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
