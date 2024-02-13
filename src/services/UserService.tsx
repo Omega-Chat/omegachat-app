@@ -34,7 +34,7 @@ export default class UserService {
       }
       
 
-    async login(email: string, password: string): Promise<User> {
+    async login(email: string): Promise<User> {
         const response = await fetch(`http://localhost:8081/api/loginUser`, {
             method: 'POST',
             headers: {
@@ -42,8 +42,7 @@ export default class UserService {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: email,
-                password: password,
+                email: email
             })
         })
         const responseJSON = await response.json();

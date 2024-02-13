@@ -3,6 +3,7 @@ import { primary } from "../theme/colors";
 import UserService from "../services/UserService";
 import { useEffect, useState } from "react";
 import CreateUser from "../use_cases/users/CreateUser";
+import bcrypt from 'bcryptjs';
 
 const createUser = new CreateUser(new UserService());
 
@@ -18,17 +19,18 @@ export default function SignUpScreen() {
     sessionStorage.removeItem('privateKey');
     sessionStorage.removeItem('hasExecuted');
   }, []);
-
+  
   async function sendData() {
     try {
-      const createdUser = await createUser.execute(name, email, password);
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      const createdUser = await createUser.execute(name, email, hashedPassword);
 
       // Atualizar o estado para exibir a mensagem de sucesso
       setSuccessMessage("Usuário cadastrado com sucesso!");
 
       // Redirecionar para a tela de login após o cadastro
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 2000); 
     } catch (error) {
       console.log(error);
@@ -58,6 +60,15 @@ export default function SignUpScreen() {
       >
         OmegaChat
       </h1>
+
+      <h3
+				style={{
+					textAlign: "left",
+					marginLeft: 25,
+					font: "icon",
+					fontSize: 20,
+					fontWeight: "bold",
+					color: primary}}>Sign Up</h3>
 
       <div style={{ margin: "5%" }}>
         <h4 style={{ textAlign: "left", marginTop: 0, marginBottom: 0, color: primary }}>
