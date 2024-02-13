@@ -1,4 +1,3 @@
-import { ChatGroup } from "../../entities/ChatGroup";
 import ChatGroupService from "../../services/ChatGroupService";
 
 export class GetGroupChatMessages {

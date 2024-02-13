@@ -14,11 +14,7 @@ import { ExitChat } from "../use_cases/users/ExitChat";
 import { DeletePrivateChat } from "../use_cases/messages/DeletePrivateChat";
 import ChatService from "../services/ChatService";
 import { EnterChat } from "../use_cases/users/EnterChat";
-import ChatGroupService from "../services/ChatGroupService";
-import { CreateChatGroup } from "../use_cases/messages/CreateChatGroup";
 import { FindChat } from "../use_cases/messages/FindChat";
-import { isStringObject } from "util/types";
-
 
 const crypto = new ElgamalService();
 const fetchall = new FetchAll(new UserService())
@@ -26,9 +22,7 @@ const updatepubkey = new UpdatePubKey(new UserService())
 const exitchat = new ExitChat(new UserService())
 const enterChat = new EnterChat(new UserService())
 const deleteChat = new DeletePrivateChat(new ChatService())
-const createGroupChat = new CreateChatGroup(new ChatGroupService())
 const findChat = new FindChat(new ChatService());
-
 
 export default function HomeChatScreen() {
 
@@ -127,10 +121,7 @@ export default function HomeChatScreen() {
 		try {
 			
 			// Example usage:
-			const test_msg = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 			let keys: ElGamalKeys;
-			let decipherText;
-			let cipherText;
 
 			keys = crypto.generateKeyPair();
 

@@ -6,7 +6,7 @@ import ElgamalService from '../services/ElgamalService';
 import ChatService from '../services/ChatService';
 import { CreateChat } from '../use_cases/messages/CreateChat';
 import { FindChat } from '../use_cases/messages/FindChat';
-import { ElGamalKeys, ElGamalPublicKey } from '../entities/Elgamal';
+import { ElGamalKeys } from '../entities/Elgamal';
 import { SendMessage } from '../use_cases/messages/SendMessage';
 import  UserService  from '../services/UserService'
 import { FindUserById } from '../use_cases/users/FindUser';

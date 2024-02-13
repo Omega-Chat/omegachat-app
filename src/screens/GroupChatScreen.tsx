@@ -219,14 +219,6 @@ export default function GroupChatScreen() {
 		margin: '0',
 	};
 
-	const messageStyle: React.CSSProperties = {
-		margin: '5px 0',
-		padding: '10px',
-		borderRadius: '8px',
-		maxWidth: '70%',
-		wordWrap: 'break-word',
-	};
-
 	const userMessageStyle: React.CSSProperties = {
 		alignSelf: 'flex-end',
 		backgroundColor: '#8a2be2',

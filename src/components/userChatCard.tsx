@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { User } from '../entities/User';
-import { useNavigate } from 'react-router-dom';
 import { primary, userCardBackground } from '../theme/colors';
 
 interface Props {
@@ -11,8 +10,6 @@ interface Props {
 
 
 const UserChatCard: React.FC<Props> = ({data, notification, onChatStart}) => {
-    
-    const navigate = useNavigate();
 
     return (
         <div className='container'>

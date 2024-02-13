@@ -122,8 +122,6 @@ export default class ElgamalService {
 
 		for (let i = 0; i < unicodeArray.length; i++) {
 			do {
-
-				const randomBytes = new Uint8Array(1); // Adjust the size according to your needs
 	
 				bValue = BigInt(2)
 		

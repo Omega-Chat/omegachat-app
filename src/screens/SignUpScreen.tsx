@@ -24,6 +24,7 @@ export default function SignUpScreen() {
     try {
       const hashedPassword = bcrypt.hashSync(password, 10);
       const createdUser = await createUser.execute(name, email, hashedPassword);
+      console.log(createdUser)
 
       // Atualizar o estado para exibir a mensagem de sucesso
       setSuccessMessage("Usuário cadastrado com sucesso!");

@@ -1,14 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { primary } from "../theme/colors";
-import UserService from "../services/UserService";
-import Login from "../use_cases/users/Login";
-import { useEffect, useState } from "react";
-import bcrypt from 'bcryptjs';
+import { useState } from "react";
 import axios from 'axios';
 
 
-
-const loginUser = new Login(new UserService());
 
 export default function ForgotPassScreen() {
 
