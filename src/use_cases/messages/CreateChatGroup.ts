@@ -4,10 +4,10 @@ import ChatGroupService from "../../services/ChatGroupService";
 export class CreateChatGroup {
   constructor(private readonly chatGroupService: ChatGroupService) {}
 
-  async execute(userIds: string[]): Promise<ChatGroup | null> {
+  async execute(userIds: string[], name: string): Promise<ChatGroup | null> {
     console.log("Creating chat group.")
     try {
-      const newChatGroup = await this.chatGroupService.createGroupChat(userIds);
+      const newChatGroup = await this.chatGroupService.createGroupChat(userIds, name);
       console.log("Chat group sucessfully created.")
       return newChatGroup;
     } catch (error) {
