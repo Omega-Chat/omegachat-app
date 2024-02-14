@@ -13,7 +13,6 @@ import { ElGamalKeys } from '../entities/Elgamal';
 import { GetUsersGroupChat } from '../use_cases/messages/GetUsersGroupChat';
 import { RemoveUserGroupChat } from '../use_cases/messages/RemoveUserGroupChat';
 import { DeleteChatGroup } from '../use_cases/messages/DeleteChatGroup';
-import { GetGroupChatByUser } from '../use_cases/messages/GetGoupChatByUser';
 
 const createGroupChat = new CreateChatGroup(new ChatGroupService())
 const sendMessage = new AddMessageToGroupChat(new ChatGroupService())
