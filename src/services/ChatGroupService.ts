@@ -2,7 +2,7 @@ import { ChatGroup } from "../entities/ChatGroup";
 
 export default class ChatGroupService {
 
-    async createGroupChat(userIds: string[]): Promise<ChatGroup> {
+    async createGroupChat(userIds: string[], name: string): Promise<ChatGroup> {
         // Método para criar um chat em grupo
         const response = await fetch(`http://localhost:8081/api/chatGroups`, {
           method: 'POST',
@@ -10,7 +10,7 @@ export default class ChatGroupService {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ userIds }),
+          body: JSON.stringify({ userIds, name }),
         });
         const responseJSON = await response.json();
         const responseStatus = response.status;
@@ -61,7 +61,7 @@ export default class ChatGroupService {
       async getUsersInGroupChat(chatId: string): Promise<string[] | null> {
         try {
             // Método para obter os usuários de um chat em grupo
-            const response = await fetch(`http://localhost:8081/api/chatGroups/${chatId}`, {
+            const response = await fetch(`http://localhost:8081/api/chatGroups/${chatId}/users`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -80,6 +80,29 @@ export default class ChatGroupService {
             return null;
         }
     }
+
+    async getGroupChatByUser(userId: string): Promise<string[] | null> {
+      try {
+          // Método para obter os groupos de um usuário
+          const response = await fetch(`http://localhost:8081/api/chatGroups/${userId}`, {
+              method: 'GET',
+              headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+              }
+          });
+
+          const responseJSON = await response.json();
+          const responseStatus = response.status;
+
+          if (responseStatus !== 200) throw new Error(responseJSON.message);
+
+          return responseJSON;
+      } catch (error) {
+          console.error('Error getting group chat:', error);
+          return null;
+      }
+  }
 
       async removeUser(groupId: string, userId: string): Promise<boolean> {
         const response = await fetch(`http://localhost:8081/api/chatGroups/${groupId}/${userId}`, {

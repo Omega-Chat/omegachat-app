@@ -1,6 +1,6 @@
 // import { useNavigate } from "react-router-dom";
 // import {useEffect, useState} from "react";
-import { leaveChat} from "../theme/colors";
+import { leaveChat, userCardBackground} from "../theme/colors";
 import { User } from "../entities/User";
 import UserChatCard from "../components/userChatCard";
 import ElgamalService from "../services/ElgamalService";
@@ -19,6 +19,8 @@ import { CreateChatGroup } from "../use_cases/messages/CreateChatGroup";
 import { FindChat } from "../use_cases/messages/FindChat";
 import { isStringObject } from "util/types";
 import Popup from './PopUpScreen';
+import { GetGroupChatByUser } from "../use_cases/messages/GetGoupChatByUser";
+import { group } from "console";
 
 const crypto = new ElgamalService();
 const fetchall = new FetchAll(new UserService())
@@ -28,6 +30,7 @@ const enterChat = new EnterChat(new UserService())
 const deleteChat = new DeletePrivateChat(new ChatService())
 const createGroupChat = new CreateChatGroup(new ChatGroupService())
 const findChat = new FindChat(new ChatService());
+const getChatGroup = new GetGroupChatByUser(new ChatGroupService())
 
 
 export default function HomeChatScreen() {
@@ -39,15 +42,23 @@ export default function HomeChatScreen() {
 	const [allOnlineUsers, setAllOnlineUsers] = useState<User[]>([]);
 	const [notifications, setNotification] = useState<number[]>()
 	const [isPopupOpen, setIsPopupOpen] = useState(false);
+	const [userGroups, setUserGroups] = useState<string[]>([]);
+	const [selectedTab, setSelectedTab] = useState('online');
 	
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			fetchall.execute().then((data) => {
-				setAllOnlineUsers(data);
-				let filteredUsers = RemoveUserByName(data, location.state.sender.name);
-				setOnlineUserList(filteredUsers);
-			})
+
+			if (selectedTab === 'groups') {
+				fetchUserGroups();
+			} else {
+				// Lógica para buscar usuários online
+				fetchall.execute().then((data) => {
+					setAllOnlineUsers(data);
+					let filteredUsers = RemoveUserByName(data, location.state.sender.name);
+					setOnlineUserList(filteredUsers);
+				})
+			}
 	
 			const chatId = sessionStorage.getItem('ChatId');
 			if(chatId) {
@@ -65,6 +76,20 @@ export default function HomeChatScreen() {
 
 
 	});
+
+	 // Função para buscar os grupos do usuário
+	 async function fetchUserGroups() {
+        try {
+            const groups = await getChatGroup.execute(location.state.sender._id);
+			if (groups !== null) {
+				setUserGroups(groups);
+			} else {
+				console.error('Nenhum grupo encontrado para o usuário');
+			}
+        } catch (error) {
+            console.error('Erro ao buscar os grupos do usuário:', error);
+        }
+    }
 
 	const openPopup = () => {
 		setIsPopupOpen(true);
@@ -158,11 +183,11 @@ export default function HomeChatScreen() {
 		}
 	}
 
-	async function ToGroup() {
+	async function ToGroup(group: string) {
 		const currentUserID = location.state.sender._id;
 		const userIds = [...allOnlineUsers.map(user => user._id), currentUserID];
 		navigate('/group', {
-			state: { sender: location.state.sender, user_ids: userIds},
+			state: { sender: location.state.sender, user_ids: userIds, group_name: group},
 		  })
 	}
 
@@ -179,34 +204,72 @@ export default function HomeChatScreen() {
 			>
 			  Chat
 			</h1>
-			<h3
-			  style={{
-				textAlign: 'left',
-				font: 'icon',
-				marginTop: '5%',
-				marginLeft: '5%',
-				fontSize: 20,
-				fontWeight: 'bold',
-				color: 'primary',
-			  }}
-			>
-			  Online Users
-			</h3>
+			<div>
+                    {/* Abas para selecionar entre "Online Users" e "Seus Grupos" */}
+                    <button onClick={() => setSelectedTab('online')}
+					style={{
+						textAlign: 'left',
+						font: 'icon',
+						marginTop: '5%',
+						marginLeft: '5%',
+						fontSize: 20,
+						fontWeight: 'bold',
+						color: 'primary',
+						border: 'none',
+           				background: 'none',
+            			cursor: 'pointer',
+					  }}
+					>Online Users</button>
+                    <button onClick={() => setSelectedTab('groups')}
+					style={{
+						textAlign: 'left',
+						font: 'icon',
+						marginTop: '5%',
+						marginLeft: '5%',
+						fontSize: 20,
+						fontWeight: 'bold',
+						color: 'primary',
+						border: 'none',
+           				background: 'none',
+            			cursor: 'pointer',
+					  }}
+					>Seus Grupos</button>
+                </div>
 			<hr style={{ height: 1, backgroundColor: 'black' }} />
 			<div className="itens-list">
-			  {onlineUserList?.map((user, index) => (
-				<UserChatCard
-				  key={index}
-				  data={user}
-				  notification={notifications !== undefined ? notifications[index]: 0}
-				  onChatStart={() =>
-					navigate('/private', {
-					  state: { sender: location.state.sender, recipient: user},
-					})
-				  }
-				/>
-			  ))}
-			</div>
+                    {selectedTab === 'online' && onlineUserList?.map((user, index) => (
+                        <UserChatCard
+                            key={index}
+                            data={user}
+                            notification={notifications !== undefined ? notifications[index] : 0}
+                            onChatStart={() =>
+                                navigate('/private', {
+                                    state: { sender: location.state.sender, recipient: user },
+                                })
+                            }
+                        />
+                    ))}
+                    {selectedTab === 'groups' && userGroups.map((group, index) => (
+                        <div key={index} className="group-item">
+                            {/* Exibir informações sobre o grupo */}
+							<button
+						style={{
+							backgroundColor: userCardBackground,  
+							borderRadius: '15px', 
+							padding: '25px 10px', // Adicione preenchimento interno para separar o texto da borda
+							fontSize: '20px', // Aumente o tamanho da fonte
+							margin: '10px 0', 
+							fontWeight: 'bold',
+							border: 'none',
+							width: '100%'
+						}}
+						onClick={() => ToGroup(group)}
+						>
+						{group}
+						</button>
+                        </div>
+                    ))}
+                </div>
 			
 			<img
 			  src="src\screens\img\Vector.png" // Replace with your image path

@@ -10,8 +10,9 @@ const fetchall = new FetchAll(new UserService())
 function Popup({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
 
     const [onlineUserList, setOnlineUserList] = useState<User[]>();
-	const [allOnlineUsers, setAllOnlineUsers] = useState<User[]>([]);
+	  const [allOnlineUsers, setAllOnlineUsers] = useState<User[]>([]);
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+    const [groupName, setGroupName] = useState<string>('');
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -54,11 +55,15 @@ function Popup({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
         }
     };
 
+    const handleGroupNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setGroupName(event.target.value);
+  };
+
       async function ToGroup() {
         const currentUserID = location.state.sender?._id ?? '';
         const userIds = [...selectedUserIds, currentUserID]; // Adiciona o ID do usuário atual, ou uma string vazia se não estiver disponível
         navigate('/group', {
-            state: { sender: location.state.sender, user_ids: userIds },
+            state: { sender: location.state.sender, user_ids: userIds, group_name: groupName },
         });
 	}
 
@@ -106,8 +111,9 @@ const closeBtn : React.CSSProperties = {
   const userListStyle: React.CSSProperties = {
     borderRadius: '8px', // Bordas arredondadas
     boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', // Sombra para destacar
-    padding: '10px', // Espaçamento interno
-    backgroundColor: '#f9f9f9', // Cor de fundo
+    padding: '20px', // Espaçamento interno
+    backgroundColor: '#f0f0f0', // Cor de fundo
+    marginBottom : '15px'
   };
   
   const userItemStyle = (isSelected: boolean): React.CSSProperties => ({
@@ -118,6 +124,14 @@ const closeBtn : React.CSSProperties = {
     color: isSelected ? '#ffffff' : '#000000',
     cursor: 'pointer',
   });
+
+  const buttonStyle: React.CSSProperties ={
+    border: 'none',
+    borderRadius: '5px',
+    backgroundColor: '#8a2be2',
+    padding: '7px 7px',
+    color: '#ffffff'
+  }
 
   return (
     <div style={overlay} onClick={onClose}>
@@ -130,6 +144,17 @@ const closeBtn : React.CSSProperties = {
         </div>
         <div style={body}>
         <div className="items-list" style={userListStyle}>
+        <input
+              type="text"
+              placeholder="Nome do Grupo"
+              value={groupName}
+              onChange={handleGroupNameChange}
+              style={{ marginBottom: '15px',
+                       border: 'none',
+                       padding: '8px 10px',
+                       borderRadius: '5px'
+                     }}
+            />
             {onlineUserList?.map((user) => (
               <div key={user._id}
               style={userItemStyle(selectedUserIds.includes(user._id ?? ''))}
@@ -139,7 +164,7 @@ const closeBtn : React.CSSProperties = {
               </div>
 			  ))}
 			</div>
-          <button onClick={ToGroup}>Criar grupo</button>
+          <button onClick={ToGroup} style={buttonStyle}>Criar grupo</button>
         </div>
       </div>
     </div>

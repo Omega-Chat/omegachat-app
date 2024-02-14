@@ -13,6 +13,7 @@ import { ElGamalKeys } from '../entities/Elgamal';
 import { GetUsersGroupChat } from '../use_cases/messages/GetUsersGroupChat';
 import { RemoveUserGroupChat } from '../use_cases/messages/RemoveUserGroupChat';
 import { DeleteChatGroup } from '../use_cases/messages/DeleteChatGroup';
+import { GetGroupChatByUser } from '../use_cases/messages/GetGoupChatByUser';
 
 const createGroupChat = new CreateChatGroup(new ChatGroupService())
 const sendMessage = new AddMessageToGroupChat(new ChatGroupService())
@@ -22,6 +23,7 @@ const getUsers = new GetUsersGroupChat(new ChatGroupService())
 const removeUser = new RemoveUserGroupChat(new ChatGroupService())
 const deleteChat = new DeleteChatGroup(new ChatGroupService())
 const crypto = new ElgamalService();
+const getChatGroup = new GetGroupChatByUser(new ChatGroupService())
 
 export default function GroupChatScreen() {
 
@@ -33,14 +35,13 @@ export default function GroupChatScreen() {
 	const chatEndRef = useRef<HTMLDivElement>(null);
 	const topBarRef = useRef<HTMLDivElement>(null);
 
-
 	function executeOnce() {
 
 			const hasExecuted = sessionStorage.getItem('hasExecutedChat');
 			//sessionStorage.setItem('publicKey', JSON.stringify(location.state.recipient.pub_key));
 		
 			if (!hasExecuted) {
-				createGroupChat.execute(location.state.user_ids).then((newGroupChat) => {
+				createGroupChat.execute(location.state.user_ids, location.state.group_name).then((newGroupChat) => {
 					sessionStorage.setItem('GroupChatId', String(newGroupChat?._id));
 				})
 
@@ -320,7 +321,7 @@ export default function GroupChatScreen() {
 	return (
 		<div style={chatContainerStyle}>
 		<div style={topBarStyle} ref={topBarRef}>
-			<div style={recipientNameStyle}>{"Grupo de Segurança"}</div>
+			<div style={recipientNameStyle}>{location.state.group_name}</div>
 			<FaTimes style={closeButtonStyle} onClick={closeChat} />
 			<hr style={{ width: '100%', color: 'black' }} />
 		</div>
