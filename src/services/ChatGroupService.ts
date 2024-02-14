@@ -85,7 +85,7 @@ export default class ChatGroupService {
     async getGroupChatByUser(userId: string): Promise<string[] | null> {
       try {
           // Método para obter os groupos de um usuário
-          const response = await fetch(`http://localhost:8081/api/chatGroups/${userId}`, {
+          const response = await fetch(`${API_URL}/chatGroups/${userId}`, {
               method: 'GET',
               headers: {
                   'Accept': 'application/json',

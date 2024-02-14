@@ -3,14 +3,12 @@ import { User } from '../entities/User';
 import UserService from '../services/UserService';
 import { FetchAll } from '../use_cases/users/FetchAll';
 import { useLocation, useNavigate } from 'react-router-dom';
-import UserChatCard from "../components/userChatCard";
 
 const fetchall = new FetchAll(new UserService())
 
 function Popup({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
 
     const [onlineUserList, setOnlineUserList] = useState<User[]>();
-	  const [allOnlineUsers, setAllOnlineUsers] = useState<User[]>([]);
     const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
     const [groupName, setGroupName] = useState<string>('');
     const location = useLocation();
@@ -19,7 +17,6 @@ function Popup({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     useEffect(() => {
 		const interval = setInterval(() => {
 			fetchall.execute().then((data) => {
-				setAllOnlineUsers(data);
 				let filteredUsers = RemoveUserByName(data, location.state.sender.name);
 				setOnlineUserList(filteredUsers);
 			})

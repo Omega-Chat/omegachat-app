@@ -23,7 +23,6 @@ const getUsers = new GetUsersGroupChat(new ChatGroupService())
 const removeUser = new RemoveUserGroupChat(new ChatGroupService())
 const deleteChat = new DeleteChatGroup(new ChatGroupService())
 const crypto = new ElgamalService();
-const getChatGroup = new GetGroupChatByUser(new ChatGroupService())
 
 export default function GroupChatScreen() {
 
