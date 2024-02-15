@@ -18,6 +18,7 @@ import { FindChat } from "../use_cases/messages/FindChat";
 import Popup from './PopUpScreen';
 import { GetGroupChatByUser } from "../use_cases/messages/GetGoupChatByUser";
 import ChatGroupService from "../services/ChatGroupService";
+import { FaUserGroup } from "react-icons/fa6";
 
 
 const crypto = new ElgamalService();
@@ -264,9 +265,7 @@ export default function HomeChatScreen() {
                     ))}
                 </div>
 			
-			<img
-			  src="./src/screens/img/Vector.png" // Replace with your image path
-			  alt="Image Alt Text"
+			<FaUserGroup
 			  style={{
 				width: '100px', // Adjust the width as needed
 				height: 'auto', // Maintain aspect ratio
@@ -279,7 +278,7 @@ export default function HomeChatScreen() {
 			<p
 			  style={{
 				textAlign: 'center',
-				fontSize: 16,
+				fontSize: 18,
 				color: 'gray',
 				marginLeft: 230,
 			  }}
