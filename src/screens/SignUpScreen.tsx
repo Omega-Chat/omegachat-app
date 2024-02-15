@@ -26,6 +26,7 @@ export default function SignUpScreen() {
     try {
       setShowMessageError(false);
       const createdUser = await createUser.execute(name, email, password);
+      console.log(createdUser)
 
       // Atualizar o estado para exibir a mensagem de sucesso
       setSuccessMessage("Usuário cadastrado com sucesso!");

@@ -3,7 +3,6 @@ import { primary } from "../theme/colors";
 import UserService from "../services/UserService";
 import Login from "../use_cases/users/Login";
 import { useEffect, useState } from "react";
-import bcrypt from 'bcryptjs';
 import ValidationMessage from "../components/validationMessage";
 
 
