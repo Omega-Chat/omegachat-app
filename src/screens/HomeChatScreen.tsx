@@ -19,6 +19,7 @@ import Popup from './PopUpScreen';
 import { GetGroupChatByUser } from "../use_cases/messages/GetGoupChatByUser";
 import ChatGroupService from "../services/ChatGroupService";
 
+
 const crypto = new ElgamalService();
 const fetchall = new FetchAll(new UserService())
 const updatepubkey = new UpdatePubKey(new UserService())
@@ -264,7 +265,7 @@ export default function HomeChatScreen() {
                 </div>
 			
 			<img
-			  src="src/screens/img/Vector.png" // Replace with your image path
+			  src="./src/screens/img/Vector.png" // Replace with your image path
 			  alt="Image Alt Text"
 			  style={{
 				width: '100px', // Adjust the width as needed
