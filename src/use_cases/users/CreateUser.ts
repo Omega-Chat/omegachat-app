@@ -1,5 +1,6 @@
 import UserService from "../../services/UserService";
 import { User } from "../../entities/User";
+import bcrypt from 'bcryptjs';
 
 export default class CreateUser {
     private userService: UserService;
@@ -10,15 +11,19 @@ export default class CreateUser {
   
     async execute(name: string, email: string, password: string): Promise<User | null> {
 
+      
       // Validar os campos do usuário
       if (!this.isValidField(name)) throw new Error("Preencha o campo de nome.");
       if (!this.isValidField(email)) throw new Error("Preencha o campo de email.");
-      if (!this.isValidPassword(password)) throw new Error("A senha deve possuir entre 8 e 20 caracteres, contendo números e letras maiúscula e minusculas.")
       if (!this.isValidField(password)) throw new Error("Preencha o campo de senha.");
+      if (!this.isValidPassword(password)) throw new Error("A senha deve possuir entre 8 e 20 caracteres, contendo números e letras maiúscula e minusculas.")
       if (!this.isValidEmail(email)) throw new Error("Insira um email válido.");
-  
+      
+      // Gerar hash da senha após validação
+      const hashedPassword = bcrypt.hashSync(password, 10);
+
       // Criar o novo usuário
-      const createdUser = await this.userService.createUser(name, email, password);
+      const createdUser = await this.userService.createUser(name, email, hashedPassword);
   
       return createdUser;
     }

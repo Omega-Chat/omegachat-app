@@ -3,7 +3,7 @@ import { primary } from "../theme/colors";
 import UserService from "../services/UserService";
 import { useEffect, useState } from "react";
 import CreateUser from "../use_cases/users/CreateUser";
-import bcrypt from 'bcryptjs';
+import ValidationMessage from "../components/validationMessage";
 
 const createUser = new CreateUser(new UserService());
 
@@ -11,6 +11,8 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [showMessageError, setShowMessageError] = useState(false)
+  const [messageError, setMessageError] = useState("")
   const [successMessage, setSuccessMessage] = useState("");
 
   const navigate = useNavigate();
@@ -22,9 +24,8 @@ export default function SignUpScreen() {
   
   async function sendData() {
     try {
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      const createdUser = await createUser.execute(name, email, hashedPassword);
-      console.log(createdUser)
+      setShowMessageError(false);
+      const createdUser = await createUser.execute(name, email, password);
 
       // Atualizar o estado para exibir a mensagem de sucesso
       setSuccessMessage("Usuário cadastrado com sucesso!");
@@ -33,8 +34,9 @@ export default function SignUpScreen() {
       setTimeout(() => {
         navigate("/");
       }, 2000); 
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      setShowMessageError(true);
+      setMessageError(error.message);
     }
   }
 
@@ -61,6 +63,8 @@ export default function SignUpScreen() {
       >
         OmegaChat
       </h1>
+
+      {showMessageError && <ValidationMessage error_text={messageError} />}
 
       <h3
 				style={{
