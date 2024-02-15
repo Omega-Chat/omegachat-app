@@ -4,6 +4,7 @@ import UserService from "../services/UserService";
 import Login from "../use_cases/users/Login";
 import { useEffect, useState } from "react";
 import bcrypt from 'bcryptjs';
+import ValidationMessage from "../components/validationMessage";
 
 
 
@@ -13,6 +14,8 @@ export default function LoginScreen() {
 
 	const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+	const [showMessageError, setShowMessageError] = useState(false)
+  	const [messageError, setMessageError] = useState("")
 
 	const navigate = useNavigate();
 
@@ -26,30 +29,18 @@ export default function LoginScreen() {
 	async function SendData() {
 
         try {
+				setShowMessageError(false);
                 const loggeduser = await loginUser.execute(email, password);
 				
-				if(loggeduser){
-					bcrypt.compare(password, loggeduser?.password, function(err, isMatch){
-						if(err){
-							throw err;
-						} else if(!isMatch) {
-							console.log('Password dosen`t match!')
-						} else {
-							if(loggeduser?._id !== undefined){
-								console.log(loggeduser._id)
-								sessionStorage.setItem('loggeduser', loggeduser._id);
-							}
-							navigate("/chat", {state: {sender: loggeduser}});
-						}
-					})
+				if(loggeduser?._id !== undefined){
+					console.log(loggeduser._id)
+					sessionStorage.setItem('loggeduser', loggeduser._id);
+					navigate("/chat", {state: {sender: loggeduser}});
 				}
 				
-				
-
-                
-
         } catch (error: any) {
-            console.log(error)
+			setShowMessageError(true);
+			setMessageError(error.message);
         }
 
     }
@@ -72,6 +63,8 @@ export default function LoginScreen() {
 					fontSize: 35,
 					fontWeight: "bold",
 					color: primary}}>OmegaChat</h1>
+
+			{showMessageError && <ValidationMessage error_text={messageError} />}
 			
 			<h3
 				style={{

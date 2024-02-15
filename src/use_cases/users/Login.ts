@@ -1,5 +1,6 @@
 import UserService from "../../services/UserService";
 import { User } from "../../entities/User";
+import bcrypt from 'bcryptjs';
 
 export default class Login {
    private userService: UserService;
@@ -10,13 +11,28 @@ export default class Login {
 
    async execute(email: string, password: string): Promise<User | null> {
 
-      if (!this.isValidField(password)) throw new Error("Preencha o campo de senha.");
       if (!this.isValidField(email)) throw new Error("Preencha o campo de email.");
+      if (!this.isValidField(password)) throw new Error("Preencha o campo de senha.");
       if (!this.isValidEmail(email)) throw new Error("Preencha um email válido.")
 
-      const hashedPassword = await this.userService.login(email);
+      const loggeduser = await this.userService.login(email);
 
-      return hashedPassword;
+      const isMatch = await new Promise((resolve, reject) => {
+         bcrypt.compare(password, loggeduser?.password, function (err, result) {
+             if (err) {
+                 reject(err);
+             } else {
+                 resolve(result);
+             }
+         });
+     });
+
+     if (!isMatch) {
+         throw new Error("Email ou senha inválidos");
+     }
+
+     console.log("Login: ", loggeduser);
+     return loggeduser;
 
    }
 
