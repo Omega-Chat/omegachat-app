@@ -264,7 +264,7 @@ export default function HomeChatScreen() {
                 </div>
 			
 			<img
-			  src="src\screens\img\Vector.png" // Replace with your image path
+			  src="src/screens/img/Vector.png" // Replace with your image path
 			  alt="Image Alt Text"
 			  style={{
 				width: '100px', // Adjust the width as needed
